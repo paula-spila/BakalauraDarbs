@@ -6,6 +6,7 @@ import { CartProviderBridge } from "./context/CartProviderBridge.jsx";
 import App from "./App.jsx";
 import "./index.css";
 import "./variants/rich/theme.css";
+import "./variants/rich/rich-extras.css";
 
 const rawBase = import.meta.env.BASE ?? "/";
 const basename =

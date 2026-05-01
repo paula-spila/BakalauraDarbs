@@ -1,8 +1,8 @@
 import { Link } from "react-router-dom";
-import { PRODUCT_CATEGORIES } from "../data/products.js";
-import { PRODUCTS } from "../data/products.js";
+import { PRODUCT_CATEGORIES, PRODUCTS } from "../data/products.js";
 import { ProductCard } from "../components/ProductCard.jsx";
-import { usePrefixedTo } from "../context/VariantContext.jsx";
+import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
+import { RichHomePage } from "../variants/rich/RichHomePage.jsx";
 
 const FEATURED_IDS = [2, 8, 16];
 
@@ -15,6 +15,12 @@ const categoryBlurb = {
 
 export function Home() {
   const to = usePrefixedTo();
+  const { isRich } = useVariant();
+
+  if (isRich) {
+    return <RichHomePage />;
+  }
+
   const featured = FEATURED_IDS.map((id) =>
     PRODUCTS.find((p) => p.id === id),
   ).filter(Boolean);

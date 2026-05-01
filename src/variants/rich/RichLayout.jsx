@@ -1,15 +1,19 @@
-import { Link, Outlet, NavLink } from "react-router-dom";
+import { Link, Outlet, NavLink, useLocation } from "react-router-dom";
 import { useCart } from "../../context/CartContext.jsx";
 import { HeaderSearch } from "../../components/HeaderSearch.jsx";
-import { VariantSegmentToggle } from "../../components/VariantSegmentToggle.jsx";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
+import { PRODUCT_CATEGORIES } from "../../data/products.js";
+import { formatEur } from "../../lib/formatEur.js";
+import { VariantSegmentToggle } from "../../components/VariantSegmentToggle.jsx";
+import { RichHelpChat } from "./RichHelpChat.jsx";
 
 const navClass = ({ isActive }) =>
   isActive ? "site-nav__link site-nav__link--active" : "site-nav__link";
 
 export function RichLayout() {
-  const { itemCount } = useCart();
+  const { itemCount, subtotal } = useCart();
   const to = usePrefixedTo();
+  const { pathname } = useLocation();
 
   return (
     <div className="variant-rich">
@@ -17,92 +21,115 @@ export function RichLayout() {
         <a href="#content" className="skip-link">
           Pāriet pie satura
         </a>
-        <div className="top-bar" role="region" aria-label="Aktuāli">
-          <div className="top-bar__inner">
-            <span>Bezmaksas piegāde pasūtījumiem virs 35,00 €</span>
+
+        {/* (1) Promo bar */}
+        <div
+          className="top-bar top-bar--promo rich-header__promo"
+          role="region"
+          aria-label="Aktuāli un akcijas"
+        >
+          <div className="rich-header__container rich-header__promo-inner">
+            <span className="top-bar__pill">−15% atlasītām precēm</span>
             <span className="top-bar__sep" aria-hidden="true">
               ·
             </span>
-            <span>Piegāde 2–3 darba dienas</span>
+            <span>Bezmaksas piegāde virs 35 €</span>
+            <span className="top-bar__sep" aria-hidden="true">
+              ·
+            </span>
+            <span>2–3 darba dienas</span>
           </div>
         </div>
-        <header className="site-header site-header--store">
-          <div className="site-header__row1">
-            <div className="site-header__inner site-header__inner--wide">
-              <NavLink to={to("/")} className="site-logo" end>
-                <span className="site-logo__mark" aria-hidden="true" />
-                <span className="site-logo__text">Vienkārši mājām</span>
-              </NavLink>
-              <HeaderSearch />
-              <VariantSegmentToggle className="header-variant-toggle" />
+
+        <header className="site-header site-header--store rich-header">
+          {/* (2) Logo · search · cart · A/B */}
+          <div className="site-header__row1 rich-header__tier rich-header__tier--main">
+            <div className="rich-header__container rich-header__main-grid">
+              <div className="rich-header__brand">
+                <NavLink to={to("/")} className="site-logo" end>
+                  <span className="site-logo__mark" aria-hidden="true" />
+                  <span className="site-logo__text">Vienkārši mājām</span>
+                </NavLink>
+              </div>
+              <div className="rich-header__search-wrap">
+                <HeaderSearch />
+              </div>
+              <div className="rich-header__tools">
+                <Link to={to("/grozs")} className="rich-header-mini-cart">
+                  Grozs: {itemCount} gab. · {formatEur(subtotal)}
+                </Link>
+                <VariantSegmentToggle placement="header" />
+              </div>
             </div>
           </div>
-          <div className="site-header__row2">
-            <div className="site-header__inner site-header__inner--wide">
-              <nav className="site-nav" aria-label="Galvenā navigācija">
-                <NavLink to={to("/veikals")} className={navClass}>
-                  Veikals
-                </NavLink>
-                <NavLink to={to("/par-mums")} className={navClass}>
-                  Par mums
-                </NavLink>
-                <NavLink to={to("/piegade")} className={navClass}>
-                  Piegāde
-                </NavLink>
-                <NavLink to={to("/grozs")} className={navClass}>
-                  <span className="site-nav__cart">
-                    Grozs
-                    {itemCount > 0 ? (
-                      <span
-                        className="cart-badge"
-                        aria-label={`preces grozā: ${itemCount}`}
-                      >
-                        {itemCount}
-                      </span>
-                    ) : null}
-                  </span>
-                </NavLink>
-                <NavLink to={to("/informacija")} className={navClass}>
-                  Informācija / BUJ
-                </NavLink>
-              </nav>
+
+          {/* (3) Navigation: categories, then quick links + site nav */}
+          <div className="site-header__row2 rich-header__tier rich-header__tier--nav">
+            <div className="rich-header__container rich-header__nav-stack">
+              <div className="rich-header__nav-block rich-header__nav-block--chips">
+                <p className="rich-header__eyebrow" id="rich-nav-cats-label">
+                  Kategorijas
+                </p>
+                <nav
+                  className="rich-cat-chips"
+                  aria-labelledby="rich-nav-cats-label"
+                >
+                  {PRODUCT_CATEGORIES.map((c) => (
+                    <Link
+                      key={c.id}
+                      className="rich-cat-chips__link"
+                      to={`${to("/veikals")}?k=${encodeURIComponent(c.id)}`}
+                    >
+                      {c.label}
+                    </Link>
+                  ))}
+                </nav>
+              </div>
+
+              <div className="rich-header__nav-block rich-header__nav-block--menus">
+                <nav className="rich-header-links" aria-label="Ātrās saites">
+                  <Link to={to("/")}>Jaunumi</Link>
+                  <Link to={to("/veikals")}>Piedāvājumi</Link>
+                  <Link to={to("/veikals")}>Jaunpreces</Link>
+                  <Link to={to("/piegade")}>Piegāde</Link>
+                  <Link to={to("/kontakti")}>Palīdzība</Link>
+                </nav>
+                <nav className="site-nav" aria-label="Galvenā navigācija">
+                  <NavLink to={to("/veikals")} className={navClass}>
+                    Veikals
+                  </NavLink>
+                  <NavLink to={to("/par-mums")} className={navClass}>
+                    Par mums
+                  </NavLink>
+                  <NavLink to={to("/piegade")} className={navClass}>
+                    Piegāde
+                  </NavLink>
+                  <NavLink to={to("/grozs")} className={navClass}>
+                    <span className="site-nav__cart">
+                      Grozs
+                      {itemCount > 0 ? (
+                        <span
+                          className="cart-badge"
+                          aria-label={`preces grozā: ${itemCount}`}
+                        >
+                          {itemCount}
+                        </span>
+                      ) : null}
+                    </span>
+                  </NavLink>
+                  <NavLink to={to("/informacija")} className={navClass}>
+                    Informācija / BUJ
+                  </NavLink>
+                </nav>
+              </div>
             </div>
           </div>
         </header>
+
         <main className="site-main site-main--wide" id="content">
-          <div className="flash-row" role="presentation">
-            <span className="flash-row__chip">JAUNUMI</span>
-            <span>40+ preces — virtuve, vanna, māja, kanceleja</span>
-            <span className="flash-row__chip">ĀTRA PIEGĀDE</span>
-            <span>2–3 darba dienas</span>
-            <span className="flash-row__chip">DĀVANĀM</span>
-            <span>Somas un sveces</span>
+          <div key={pathname} className="rich-outlet-fade">
+            <Outlet />
           </div>
-          <div className="cta-banner">
-            <div className="cta-banner__grid">
-              <div>
-                <p className="cta-banner__title">
-                  Pētījuma variants B — blīvāks, krāsaināks izkārtojums
-                </p>
-                <p className="cta-banner__sub">
-                  Tās pašas preces un uzdevumi kā minimālajā versijā; mainīts tikai
-                  vizuālais dizains.
-                </p>
-              </div>
-              <div className="cta-banner__actions">
-                <Link to={to("/veikals")} className="btn btn--small">
-                  Uz veikalu
-                </Link>
-                <Link to={to("/grozs")} className="btn btn--ghost btn--small">
-                  Grozs
-                </Link>
-                <Link to={to("/kontakti")} className="btn btn--ghost btn--small">
-                  Palīdzība
-                </Link>
-              </div>
-            </div>
-          </div>
-          <Outlet />
         </main>
         <footer className="site-footer site-footer--store">
           <div className="site-footer__grid">
@@ -161,6 +188,7 @@ export function RichLayout() {
             <strong>Variants B (ne minimālais).</strong>
           </p>
         </footer>
+        <RichHelpChat />
       </div>
     </div>
   );

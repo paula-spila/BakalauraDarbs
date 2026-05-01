@@ -37,7 +37,8 @@ function storeRouteList() {
 
 export default function App() {
   return (
-    <Routes>
+    <>
+      <Routes>
       <Route path="/rich/*" element={<RichLayout />}>
         {storeRouteList()}
       </Route>
@@ -45,5 +46,6 @@ export default function App() {
         {storeRouteList()}
       </Route>
     </Routes>
+    </>
   );
 }

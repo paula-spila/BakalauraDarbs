@@ -4,8 +4,18 @@ import { formatEur } from "../lib/formatEur.js";
 import { useCart } from "../context/CartContext.jsx";
 import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
 
+function TrustMini() {
+  return (
+    <ul className="rich-trust-mini">
+      <li>Droša apmaksa (simulācija)</li>
+      <li>2–3 darba dienas</li>
+      <li>14 dienu atgriešana</li>
+    </ul>
+  );
+}
+
 export function Checkout() {
-  const { thanksSessionKey } = useVariant();
+  const { thanksSessionKey, isRich } = useVariant();
   const to = usePrefixedTo();
   const { lines, subtotal, clearCart } = useCart();
   const [formError, setFormError] = useState("");
@@ -112,83 +122,254 @@ export function Checkout() {
     clearCart();
   }
 
-  return (
-    <>
-      <h1 className="page-title">Noformēšana</h1>
-      <p className="lead">
-        Aizpildiet piegādes datus. Maksājums netiek veikts — tā ir simulācija.
+  const summaryPanel = (
+    <div className="panel panel--summary">
+      <h2 className="panel__title">Pasūtījuma kopsavilkums</h2>
+      <ul className="summary-list">
+        {lines.map((l) => (
+          <li key={l.productId}>
+            {l.name} × {l.qty} — {formatEur(l.unitPrice * l.qty)}
+          </li>
+        ))}
+      </ul>
+      <p className="summary-total">
+        <strong>Kopā:</strong> {formatEur(subtotal)}
       </p>
-      <div className="panel panel--summary">
-        <h2 className="panel__title">Pasūtījuma kopsavilkums</h2>
-        <ul className="summary-list">
-          {lines.map((l) => (
-            <li key={l.productId}>
-              {l.name} × {l.qty} — {formatEur(l.unitPrice * l.qty)}
-            </li>
-          ))}
-        </ul>
-        <p className="summary-total">
-          <strong>Kopā:</strong> {formatEur(subtotal)}
-        </p>
-      </div>
-      <form className="form-stack" onSubmit={handleSubmit} noValidate>
-        <label htmlFor="fullname">Vārds, uzvārds</label>
+    </div>
+  );
+
+  const formBlock = (
+    <form className="form-stack" onSubmit={handleSubmit} noValidate>
+      <label htmlFor="fullname">Vārds, uzvārds</label>
+      <input
+        id="fullname"
+        name="fullname"
+        autoComplete="name"
+        value={fullname}
+        onChange={(e) => setFullname(e.target.value)}
+      />
+      <label htmlFor="email">E-pasts</label>
+      <input
+        id="email"
+        name="email"
+        type="email"
+        autoComplete="email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)}
+      />
+      <label htmlFor="address">Ielas nosaukums un numurs</label>
+      <input
+        id="address"
+        name="address"
+        autoComplete="street-address"
+        value={address}
+        onChange={(e) => setAddress(e.target.value)}
+      />
+      <label htmlFor="city">Pilsēta</label>
+      <input
+        id="city"
+        name="city"
+        autoComplete="address-level2"
+        value={city}
+        onChange={(e) => setCity(e.target.value)}
+      />
+      <label htmlFor="postal">Pasta indekss</label>
+      <input
+        id="postal"
+        name="postal"
+        autoComplete="postal-code"
+        value={postal}
+        onChange={(e) => setPostal(e.target.value)}
+      />
+      <label className="checkbox-row">
         <input
-          id="fullname"
+          type="checkbox"
+          checked={terms}
+          onChange={(e) => setTerms(e.target.checked)}
+        />
+        <span>
+          Piekrītu{" "}
+          <Link to={to("/informacija#buj")}>noteikumiem un BUJ</Link>.
+        </span>
+      </label>
+      {formError ? <p className="form-error">{formError}</p> : null}
+      <button type="submit" className="btn">
+        Apstiprināt pasūtījumu
+      </button>
+    </form>
+  );
+
+  const richFormBlock = (
+    <form className="form-stack rich-co-form" onSubmit={handleSubmit} noValidate>
+      <fieldset className="rich-co-fieldset">
+        <legend className="rich-co-legend">Kontaktpersona</legend>
+        <label htmlFor="fullname-rich">Vārds, uzvārds</label>
+        <input
+          id="fullname-rich"
           name="fullname"
           autoComplete="name"
           value={fullname}
           onChange={(e) => setFullname(e.target.value)}
         />
-        <label htmlFor="email">E-pasts</label>
+        <label htmlFor="email-rich">E-pasts</label>
         <input
-          id="email"
+          id="email-rich"
           name="email"
           type="email"
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <label htmlFor="address">Ielas nosaukums un numurs</label>
+      </fieldset>
+      <fieldset className="rich-co-fieldset">
+        <legend className="rich-co-legend">Piegādes adrese</legend>
+        <label htmlFor="address-rich">Ielas nosaukums un numurs</label>
         <input
-          id="address"
+          id="address-rich"
           name="address"
           autoComplete="street-address"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
         />
-        <label htmlFor="city">Pilsēta</label>
+        <label htmlFor="city-rich">Pilsēta</label>
         <input
-          id="city"
+          id="city-rich"
           name="city"
           autoComplete="address-level2"
           value={city}
           onChange={(e) => setCity(e.target.value)}
         />
-        <label htmlFor="postal">Pasta indekss</label>
+        <label htmlFor="postal-rich">Pasta indekss</label>
         <input
-          id="postal"
+          id="postal-rich"
           name="postal"
           autoComplete="postal-code"
           value={postal}
           onChange={(e) => setPostal(e.target.value)}
         />
-        <label className="checkbox-row">
-          <input
-            type="checkbox"
-            checked={terms}
-            onChange={(e) => setTerms(e.target.checked)}
-          />
-          <span>
-            Piekrītu{" "}
-            <Link to={to("/informacija#buj")}>noteikumiem un BUJ</Link>.
-          </span>
-        </label>
-        {formError ? <p className="form-error">{formError}</p> : null}
-        <button type="submit" className="btn">
-          Apstiprināt pasūtījumu
-        </button>
-      </form>
+      </fieldset>
+      <label className="checkbox-row">
+        <input
+          type="checkbox"
+          checked={terms}
+          onChange={(e) => setTerms(e.target.checked)}
+        />
+        <span>
+          Piekrītu{" "}
+          <Link to={to("/informacija#buj")}>noteikumiem un BUJ</Link>.
+        </span>
+      </label>
+      {formError ? <p className="form-error">{formError}</p> : null}
+      <button type="submit" className="btn">
+        Apstiprināt pasūtījumu
+      </button>
+    </form>
+  );
+
+  const intro = (
+    <>
+      <h1 className="page-title">Noformēšana</h1>
+      <p className="lead">
+        Aizpildiet piegādes datus. Maksājums netiek veikts — tā ir simulācija.
+      </p>
+    </>
+  );
+
+  if (isRich) {
+    return (
+      <div className="checkout-layout-rich">
+        <div className="checkout-layout-rich__main">
+          <ol className="rich-checkout-steps" aria-label="Pasūtījuma soļi">
+            <li className="rich-checkout-steps__item rich-checkout-steps__item--done">
+              <span>1. Grozs</span>
+            </li>
+            <li className="rich-checkout-steps__item rich-checkout-steps__item--current">
+              <span>2. Piegādes dati</span>
+            </li>
+            <li className="rich-checkout-steps__item">
+              <span>3. Apstiprinājums</span>
+            </li>
+          </ol>
+          {intro}
+          <div className="rich-checkout-callout" role="presentation">
+            <strong>Piegāde</strong> — standarta termiņš{" "}
+            <Link to={to("/piegade")}>2–3 darba dienas</Link>; dažām precēm līdz 5–7
+            dienām. Maksājums šeit netiek veikts (simulācija).
+          </div>
+          {summaryPanel}
+          {richFormBlock}
+        </div>
+        <aside className="checkout-layout-rich__aside" aria-label="Papildu informācija">
+          <div className="rich-side-card">
+            <h2 className="rich-side-card__title">Jūsu grozs</h2>
+            <ul className="rich-side-card__lines">
+              {lines.map((l) => (
+                <li key={l.productId}>
+                  {l.name} × {l.qty}
+                </li>
+              ))}
+            </ul>
+            <p className="rich-side-card__total">
+              <strong>Kopā:</strong> {formatEur(subtotal)}
+            </p>
+          </div>
+          <div className="rich-side-card rich-side-card--muted">
+            <label htmlFor="co-promo" className="rich-side-card__label">
+              Akcijas kods
+            </label>
+            <input
+              id="co-promo"
+              type="text"
+              className="rich-promo-input"
+              placeholder="piemēram, STUDIJA"
+              disabled
+              readOnly
+              title="Demonstrācija — kods nestrādā"
+            />
+          </div>
+          <div className="rich-side-card">
+            <h2 className="rich-side-card__title">Nepieciešama palīdzība?</h2>
+            <p className="rich-side-card__hint">
+              Darba dienās <strong>9:00–17:00</strong> (demonstrācija).
+            </p>
+            <Link to={to("/kontakti")} className="btn btn--ghost btn--small btn--block">
+              Kontakti
+            </Link>
+          </div>
+          <div className="rich-side-card rich-side-card--muted">
+            <h2 className="rich-side-card__title">Ātras atbildes</h2>
+            <p className="rich-side-card__hint" style={{ marginBottom: "0.5rem" }}>
+              BUJ, atgriešana, piegādes izsekošana (simulācija).
+            </p>
+            <Link to={to("/informacija")} className="btn btn--small btn--block">
+              Atvērt BUJ
+            </Link>
+          </div>
+          <div className="rich-side-card">
+            <h2 className="rich-side-card__title">Jaunumi e-pastā</h2>
+            <p className="rich-side-card__fineprint">
+              Pierakstieties akcijām — forma netiek nosūtīta (demonstrācija).
+            </p>
+            <input
+              type="email"
+              className="rich-promo-input"
+              placeholder="jūsu@epasts.lv"
+              disabled
+              readOnly
+              aria-label="E-pasts demonstrācijai"
+            />
+          </div>
+          <TrustMini />
+        </aside>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      {intro}
+      {summaryPanel}
+      {formBlock}
     </>
   );
 }

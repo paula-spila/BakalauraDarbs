@@ -33,7 +33,9 @@ export function Layout() {
               <span className="site-logo__text">Vienkārši mājām</span>
             </NavLink>
             <HeaderSearch />
-            <VariantSegmentToggle className="header-variant-toggle" />
+            <div className="site-header__aside">
+              <VariantSegmentToggle placement="header" />
+            </div>
           </div>
         </div>
         <div className="site-header__row2">

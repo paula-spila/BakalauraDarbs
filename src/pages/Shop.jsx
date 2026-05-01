@@ -1,7 +1,9 @@
 import { useMemo, useState, useEffect } from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import { PRODUCT_CATEGORIES, PRODUCTS } from "../data/products.js";
+import { formatEur } from "../lib/formatEur.js";
 import { ProductCard } from "../components/ProductCard.jsx";
+import { RichProductCard } from "../variants/rich/RichProductCard.jsx";
 import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
 
 function normalizeQ(str) {
@@ -26,6 +28,12 @@ function validCategoryId(k) {
   return PRODUCT_CATEGORIES.some((c) => c.id === k) ? k : null;
 }
 
+function isSlowDelivery(delivery) {
+  return String(delivery).includes("5–7") || String(delivery).includes("5-7");
+}
+
+const RAIL_BEST_IDS = [2, 5, 11, 16];
+
 export function Shop() {
   const [searchParams, setSearchParams] = useSearchParams();
   const qParam = searchParams.get("q") ?? "";
@@ -33,6 +41,11 @@ export function Shop() {
   const [categoryId, setCategoryId] = useState(() => validCategoryId(kParam));
   const to = usePrefixedTo();
   const { isRich } = useVariant();
+
+  const [sortKey, setSortKey] = useState("default");
+  const [priceMax, setPriceMax] = useState("");
+  const [availFilter, setAvailFilter] = useState("all");
+  const [deliveryFilter, setDeliveryFilter] = useState("all");
 
   useEffect(() => {
     setCategoryId(validCategoryId(kParam));
@@ -44,9 +57,37 @@ export function Shop() {
     return PRODUCTS.filter((p) => {
       if (categoryId && p.categoryId !== categoryId) return false;
       if (!qNorm) return true;
-      return productMatchesQuery(p, qNorm);
+      if (!productMatchesQuery(p, qNorm)) return false;
+      return true;
+    }).filter((p) => {
+      if (priceMax) {
+        const n = Number(priceMax);
+        if (Number.isFinite(n) && p.price > n) return false;
+      }
+      if (availFilter === "stock") {
+        if (p.id % 11 === 0) return false;
+      }
+      if (availFilter === "wait") {
+        if (p.id % 11 !== 0) return false;
+      }
+      if (deliveryFilter === "fast") {
+        if (isSlowDelivery(p.delivery)) return false;
+      }
+      if (deliveryFilter === "slow") {
+        if (!isSlowDelivery(p.delivery)) return false;
+      }
+      return true;
     });
-  }, [categoryId, qNorm]);
+  }, [categoryId, qNorm, priceMax, availFilter, deliveryFilter]);
+
+  const sorted = useMemo(() => {
+    const arr = [...filtered];
+    if (sortKey === "price-asc") arr.sort((a, b) => a.price - b.price);
+    else if (sortKey === "price-desc") arr.sort((a, b) => b.price - a.price);
+    else if (sortKey === "name") arr.sort((a, b) => a.name.localeCompare(b.name, "lv"));
+    else arr.sort((a, b) => a.id - b.id);
+    return arr;
+  }, [filtered, sortKey]);
 
   function setCategory(next) {
     setSearchParams((prev) => {
@@ -89,12 +130,267 @@ export function Shop() {
         </p>
       ) : (
         <div className="product-grid product-grid--store">
-          {filtered.map((p) => (
+          {sorted.map((p) => (
             <ProductCard key={p.id} product={p} />
           ))}
         </div>
       )}
     </>
+  );
+
+  const richMain = (
+    <div className="rich-shop-page">
+      <aside className="rich-shop-filters" aria-label="Filtri un kategorijas">
+        <div className="rich-filter-block">
+          <h2 className="rich-filter-block__title">Kategorija</h2>
+          <fieldset className="rich-filter-fieldset">
+            <legend className="visually-hidden">Kategorija</legend>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-cat"
+                checked={categoryId === null}
+                onChange={() => setCategory(null)}
+              />
+              <span>Visas kategorijas</span>
+            </label>
+            {PRODUCT_CATEGORIES.map((c) => (
+              <label key={c.id} className="rich-filter-row">
+                <input
+                  type="radio"
+                  name="rich-cat"
+                  checked={categoryId === c.id}
+                  onChange={() => setCategory(c.id)}
+                />
+                <span>{c.label}</span>
+              </label>
+            ))}
+          </fieldset>
+        </div>
+        <div className="rich-filter-block">
+          <h2 className="rich-filter-block__title">Cenas diapazons</h2>
+          <label className="rich-filter-select-wrap">
+            <span className="visually-hidden">Maksimālā cena</span>
+            <select
+              className="rich-filter-select"
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+            >
+              <option value="">Jebkura cena</option>
+              <option value="15">Līdz 15 €</option>
+              <option value="20">Līdz 20 €</option>
+              <option value="25">Līdz 25 €</option>
+              <option value="30">Līdz 30 €</option>
+              <option value="40">Līdz 40 €</option>
+            </select>
+          </label>
+        </div>
+        <div className="rich-filter-block">
+          <h2 className="rich-filter-block__title">Pieejamība</h2>
+          <fieldset className="rich-filter-fieldset">
+            <legend className="visually-hidden">Pieejamība</legend>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-avail"
+                checked={availFilter === "all"}
+                onChange={() => setAvailFilter("all")}
+              />
+              <span>Visas</span>
+            </label>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-avail"
+                checked={availFilter === "stock"}
+                onChange={() => setAvailFilter("stock")}
+              />
+              <span>Tikai noliktavā</span>
+            </label>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-avail"
+                checked={availFilter === "wait"}
+                onChange={() => setAvailFilter("wait")}
+              />
+              <span>Gaidāms (demonstrācija)</span>
+            </label>
+          </fieldset>
+        </div>
+        <div className="rich-filter-block">
+          <h2 className="rich-filter-block__title">Piegādes ātrums</h2>
+          <fieldset className="rich-filter-fieldset">
+            <legend className="visually-hidden">Piegāde</legend>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-del"
+                checked={deliveryFilter === "all"}
+                onChange={() => setDeliveryFilter("all")}
+              />
+              <span>Visi termiņi</span>
+            </label>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-del"
+                checked={deliveryFilter === "fast"}
+                onChange={() => setDeliveryFilter("fast")}
+              />
+              <span>Ātri (2–3 darba dienas)</span>
+            </label>
+            <label className="rich-filter-row">
+              <input
+                type="radio"
+                name="rich-del"
+                checked={deliveryFilter === "slow"}
+                onChange={() => setDeliveryFilter("slow")}
+              />
+              <span>Garāks (5–7 darba dienas)</span>
+            </label>
+          </fieldset>
+        </div>
+        <p className="rich-filter-tip">
+          <Link to={to("/informacija#piegade")}>Piegādes informācija →</Link>
+        </p>
+      </aside>
+
+      <div className="rich-shop-main">
+        <div className="rich-shop-toolbar">
+          <p className="rich-shop-count">
+            <strong>{sorted.length}</strong>{" "}
+            {sorted.length === 1 ? "prece" : "preces"}
+            {qParam ? (
+              <>
+                {" "}
+                meklēšanai «<strong>{qParam}</strong>»
+              </>
+            ) : null}
+          </p>
+          <label className="rich-shop-sort">
+            <span className="rich-shop-sort__lab">Kārtot</span>
+            <select
+              value={sortKey}
+              onChange={(e) => setSortKey(e.target.value)}
+              aria-label="Kārtot preces"
+            >
+              <option value="default">Ieteiktā secība</option>
+              <option value="price-asc">Cena: no zemākās</option>
+              <option value="price-desc">Cena: no augstākās</option>
+              <option value="name">Nosaukums (A–Ž)</option>
+            </select>
+          </label>
+        </div>
+
+        <p className="rich-shop-lead">
+          Filtri kreisajā pusē; meklēšanai lietojiet lodziņu lapas augšpusē. Cenas kā
+          katalogā.
+        </p>
+
+        <div className="rich-shop-inline-promo" role="presentation">
+          <span className="rich-shop-inline-promo__tag">Akcijas zona</span>
+          <span>
+            Bezmaksas piegāde pasūtījumiem virs <strong>35,00 €</strong> (demonstrācija).
+          </span>
+        </div>
+
+        {sorted.length === 0 ? (
+          <p className="empty-inline">
+            Neviena prece neatbilst filtriem.{" "}
+            <button
+              type="button"
+              className="link-button"
+              onClick={() => {
+                setCategory(null);
+                setPriceMax("");
+                setAvailFilter("all");
+                setDeliveryFilter("all");
+                setSortKey("default");
+              }}
+            >
+              Notīrīt filtrus
+            </button>{" "}
+            vai <Link to={to("/veikals")}>atvērt veikalu</Link>
+          </p>
+        ) : (
+          <div className="rich-product-grid">
+            {sorted.map((p) => (
+              <RichProductCard key={p.id} product={p} compact />
+            ))}
+          </div>
+        )}
+      </div>
+
+      <aside className="rich-shop-rail" aria-label="Piedāvājumi un palīdzība">
+        <div className="rich-rail-card rich-rail-card--promo">
+          <p className="rich-rail-card__eyebrow">Sezonas izpārdošana</p>
+          <p className="rich-rail-card__p">
+            Atlasītām precēm īpašas cenas katalogā. Bezmaksas piegāde virs{" "}
+            <strong>35,00 €</strong> (demonstrācija).
+          </p>
+        </div>
+        <div className="rich-rail-card">
+          <h2 className="rich-rail-card__title">Ātri fakti</h2>
+          <p className="rich-rail-card__p">
+            Standarta piegāde: <strong>2–3 darba dienas</strong>.
+          </p>
+          <p className="rich-rail-card__p">
+            Dažām precēm — <strong>5–7 darba dienas</strong>; filtrējiet kreisajā pusē.
+          </p>
+        </div>
+        <div className="rich-rail-card rich-rail-card--accent">
+          <h2 className="rich-rail-card__title">Palīdzība</h2>
+          <p className="rich-rail-card__p">
+            <Link to={to("/kontakti")}>Kontakti</Link> ·{" "}
+            <Link to={to("/informacija")}>BUJ</Link>
+          </p>
+        </div>
+        <div className="rich-rail-card">
+          <h2 className="rich-rail-card__title">Top preces</h2>
+          <ul className="rich-rail-mini">
+            {RAIL_BEST_IDS.map((id) => {
+              const p = PRODUCTS.find((x) => x.id === id);
+              if (!p) return null;
+              return (
+                <li key={p.id}>
+                  <Link to={to(`/produkts/${p.id}`)}>{p.name}</Link>
+                  <span>{formatEur(p.price)}</span>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+        <div className="rich-rail-card">
+          <h2 className="rich-rail-card__title">BUJ saīsne</h2>
+          <p className="rich-rail-card__p">
+            Atgriešana, piegāde, pasūtījuma maiņa —{" "}
+            <Link to={to("/informacija#buj")}>atvērt jautājumus</Link>.
+          </p>
+        </div>
+        <div className="rich-rail-card rich-rail-card--nl">
+          <h2 className="rich-rail-card__title">Jaunumi e-pastā</h2>
+          <p className="rich-rail-card__fine">Demonstrācija — netiek sūtīts.</p>
+          <form
+            className="rich-rail-nl"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
+          >
+            <input type="email" placeholder="jūsu@epasts.lv" aria-label="E-pasts" />
+            <button type="submit" className="btn btn--small">
+              Pierakstīties
+            </button>
+          </form>
+        </div>
+        <div className="rich-rail-card">
+          <h2 className="rich-rail-card__title">Piegāde</h2>
+          <Link to={to("/piegade")} className="btn btn--small btn--block">
+            Skatīt noteikumus
+          </Link>
+        </div>
+      </aside>
+    </div>
   );
 
   return (
@@ -106,60 +402,24 @@ export function Shop() {
       </p>
       <div className="page-intro">
         <h1 className="page-title">Veikals</h1>
-        <p className="page-intro__sub">
-          {filtered.length} {filtered.length === 1 ? "prece" : "preces"}
-          {qParam ? (
-            <>
-              {" "}
-              meklēšanai «<strong>{qParam}</strong>»
-            </>
-          ) : null}
-        </p>
-        <p className="lead page-intro__lead">
-          Filtri pēc kategorijas; meklēšanai lietojiet lodziņu lapas augšpusē.
-        </p>
+        {!isRich ? (
+          <p className="page-intro__sub">
+            {filtered.length} {filtered.length === 1 ? "prece" : "preces"}
+            {qParam ? (
+              <>
+                {" "}
+                meklēšanai «<strong>{qParam}</strong>»
+              </>
+            ) : null}
+          </p>
+        ) : null}
+        {!isRich ? (
+          <p className="lead page-intro__lead">
+            Filtri pēc kategorijas; meklēšanai lietojiet lodziņu lapas augšpusē.
+          </p>
+        ) : null}
       </div>
-      {isRich ? (
-        <div className="shop-layout">
-          <aside className="shop-sidebar" aria-label="Papildu informācija">
-            <div className="shop-sidebar__block">
-              <h2 className="shop-sidebar__title">Ātri fakti</h2>
-              <p className="shop-sidebar__fake">
-                Bezmaksas piegāde, ja grozs virs <strong>35,00 €</strong>.
-              </p>
-              <p className="shop-sidebar__fake">
-                Standarta piegāde: <strong>2–3 darba dienas</strong>.
-              </p>
-            </div>
-            <div className="shop-sidebar__block">
-              <h2 className="shop-sidebar__title">Kategoriju saīsnes</h2>
-              {PRODUCT_CATEGORIES.map((c) => (
-                <p
-                  key={c.id}
-                  className="shop-sidebar__fake"
-                  style={{ margin: "0.35rem 0" }}
-                >
-                  <Link
-                    to={`${to("/veikals")}?k=${encodeURIComponent(c.id)}`}
-                  >
-                    {c.label} →
-                  </Link>
-                </p>
-              ))}
-            </div>
-            <div className="shop-sidebar__block">
-              <h2 className="shop-sidebar__title">Akcijas zona</h2>
-              <p className="shop-sidebar__fake">
-                Izvēlieties preces zemāk — cenas kā katalogā. Šī sadaļa ir papildu
-                vizuālais bloks pētījumam.
-              </p>
-            </div>
-          </aside>
-          <div>{tabsAndGrid}</div>
-        </div>
-      ) : (
-        tabsAndGrid
-      )}
+      {isRich ? richMain : tabsAndGrid}
     </>
   );
 }
