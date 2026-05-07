@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
-import { usePrefixedTo } from "../context/VariantContext.jsx";
+import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
+import { RichArticleShell } from "../variants/rich/RichArticleShell.jsx";
 
 export function Privatums() {
   const to = usePrefixedTo();
-  return (
+  const { isRich } = useVariant();
+
+  const body = (
     <article className="text-page">
       <h1 className="page-title">Privātuma politika</h1>
       <p className="lead">
@@ -44,4 +47,12 @@ export function Privatums() {
       </div>
     </article>
   );
+
+  if (isRich) {
+    return (
+      <RichArticleShell currentLabel="Privātums">{body}</RichArticleShell>
+    );
+  }
+
+  return body;
 }

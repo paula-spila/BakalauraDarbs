@@ -122,9 +122,8 @@ export function Checkout() {
     clearCart();
   }
 
-  const summaryPanel = (
-    <div className="panel panel--summary">
-      <h2 className="panel__title">Pasūtījuma kopsavilkums</h2>
+  const orderSummaryBody = (
+    <>
       <ul className="summary-list">
         {lines.map((l) => (
           <li key={l.productId}>
@@ -135,74 +134,113 @@ export function Checkout() {
       <p className="summary-total">
         <strong>Kopā:</strong> {formatEur(subtotal)}
       </p>
+    </>
+  );
+
+  const summaryPanel = (
+    <div className="panel panel--summary">
+      <h2 className="panel__title">Pasūtījuma kopsavilkums</h2>
+      {orderSummaryBody}
     </div>
   );
 
   const formBlock = (
-    <form className="form-stack" onSubmit={handleSubmit} noValidate>
-      <label htmlFor="fullname">Vārds, uzvārds</label>
-      <input
-        id="fullname"
-        name="fullname"
-        autoComplete="name"
-        value={fullname}
-        onChange={(e) => setFullname(e.target.value)}
-      />
-      <label htmlFor="email">E-pasts</label>
-      <input
-        id="email"
-        name="email"
-        type="email"
-        autoComplete="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-      />
-      <label htmlFor="address">Ielas nosaukums un numurs</label>
-      <input
-        id="address"
-        name="address"
-        autoComplete="street-address"
-        value={address}
-        onChange={(e) => setAddress(e.target.value)}
-      />
-      <label htmlFor="city">Pilsēta</label>
-      <input
-        id="city"
-        name="city"
-        autoComplete="address-level2"
-        value={city}
-        onChange={(e) => setCity(e.target.value)}
-      />
-      <label htmlFor="postal">Pasta indekss</label>
-      <input
-        id="postal"
-        name="postal"
-        autoComplete="postal-code"
-        value={postal}
-        onChange={(e) => setPostal(e.target.value)}
-      />
-      <label className="checkbox-row">
-        <input
-          type="checkbox"
-          checked={terms}
-          onChange={(e) => setTerms(e.target.checked)}
-        />
-        <span>
-          Piekrītu{" "}
-          <Link to={to("/informacija#buj")}>noteikumiem un BUJ</Link>.
-        </span>
-      </label>
-      {formError ? <p className="form-error">{formError}</p> : null}
-      <button type="submit" className="btn">
-        Apstiprināt pasūtījumu
-      </button>
+    <form className="form-stack checkout-form" onSubmit={handleSubmit} noValidate>
+      <div className="checkout-form__panel">
+        <fieldset className="checkout-fieldset">
+          <legend className="checkout-section__title">Kontaktpersona</legend>
+          <label htmlFor="fullname">Vārds, uzvārds</label>
+          <input
+            id="fullname"
+            className="checkout-input"
+            name="fullname"
+            type="text"
+            autoComplete="name"
+            value={fullname}
+            onChange={(e) => setFullname(e.target.value)}
+          />
+          <label htmlFor="email">E-pasts</label>
+          <input
+            id="email"
+            className="checkout-input"
+            name="email"
+            type="email"
+            autoComplete="email"
+            inputMode="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+          />
+        </fieldset>
+      </div>
+      <div className="checkout-form__panel">
+        <fieldset className="checkout-fieldset">
+          <legend className="checkout-section__title">Piegādes adrese</legend>
+          <label htmlFor="address">Ielas nosaukums un numurs</label>
+          <input
+            id="address"
+            className="checkout-input"
+            name="address"
+            type="text"
+            autoComplete="street-address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+          />
+          <label htmlFor="city">Pilsēta</label>
+          <input
+            id="city"
+            className="checkout-input"
+            name="city"
+            type="text"
+            autoComplete="address-level2"
+            value={city}
+            onChange={(e) => setCity(e.target.value)}
+          />
+          <label htmlFor="postal">Pasta indekss</label>
+          <input
+            id="postal"
+            className="checkout-input"
+            name="postal"
+            type="text"
+            autoComplete="postal-code"
+            inputMode="numeric"
+            value={postal}
+            onChange={(e) => setPostal(e.target.value)}
+          />
+        </fieldset>
+      </div>
+      <div className="checkout-form__panel checkout-form__panel--footer">
+        <fieldset className="checkout-fieldset checkout-fieldset--terms">
+          <legend className="checkout-section__title">Noteikumi</legend>
+          <label className="checkbox-row">
+            <input
+              type="checkbox"
+              checked={terms}
+              onChange={(e) => setTerms(e.target.checked)}
+            />
+            <span>
+              Piekrītu{" "}
+              <Link to={to("/informacija#buj")}>noteikumiem un BUJ</Link>.
+            </span>
+          </label>
+        </fieldset>
+        {formError ? <p className="form-error">{formError}</p> : null}
+        <button type="submit" className="btn btn--checkout-submit">
+          Apstiprināt pasūtījumu
+        </button>
+      </div>
     </form>
   );
 
   const richFormBlock = (
     <form className="form-stack rich-co-form" onSubmit={handleSubmit} noValidate>
-      <fieldset className="rich-co-fieldset">
-        <legend className="rich-co-legend">Kontaktpersona</legend>
+      <h2 className="rich-co-section-title" id="rich-co-h-contact">
+        Kontaktpersona
+      </h2>
+      <fieldset
+        className="rich-co-fieldset"
+        aria-labelledby="rich-co-h-contact"
+      >
+        <legend className="visually-hidden">Kontaktpersona</legend>
         <label htmlFor="fullname-rich">Vārds, uzvārds</label>
         <input
           id="fullname-rich"
@@ -221,8 +259,14 @@ export function Checkout() {
           onChange={(e) => setEmail(e.target.value)}
         />
       </fieldset>
-      <fieldset className="rich-co-fieldset">
-        <legend className="rich-co-legend">Piegādes adrese</legend>
+      <h2 className="rich-co-section-title" id="rich-co-h-address">
+        Piegādes adrese
+      </h2>
+      <fieldset
+        className="rich-co-fieldset"
+        aria-labelledby="rich-co-h-address"
+      >
+        <legend className="visually-hidden">Piegādes adrese</legend>
         <label htmlFor="address-rich">Ielas nosaukums un numurs</label>
         <input
           id="address-rich"
@@ -298,6 +342,30 @@ export function Checkout() {
           </div>
           {summaryPanel}
           {richFormBlock}
+          <div className="rich-co-followup" aria-labelledby="rich-co-follow-h">
+            <h2 id="rich-co-follow-h" className="rich-co-followup__title">
+              Kas notiks pēc pasūtījuma apstiprināšanas?
+            </h2>
+            <ol className="rich-co-followup__list">
+              <li>
+                <strong>Apstiprinājuma ekrāns</strong> — parādīsim pateicību un grozs tiks
+                noskaidrots (simulācija).
+              </li>
+              <li>
+                <strong>Pasūtījuma kopsavilkums</strong> — datus var pārskatīt BUJ sadaļā; īsts
+                maksājums netiek veikts.
+              </li>
+              <li>
+                <strong>Piegāde</strong> — standarta termiņš{" "}
+                <Link to={to("/piegade")}>2–3 darba dienas</Link>; dažām precēm līdz 5–7
+                dienām.
+              </li>
+            </ol>
+            <div className="rich-co-followup__strip" role="presentation">
+              <span className="rich-co-followup__strip-label">Aptuvenais piegādes laiks</span>
+              <span className="rich-co-followup__strip-value">2–3 darba dienas (standarta)</span>
+            </div>
+          </div>
         </div>
         <aside className="checkout-layout-rich__aside" aria-label="Papildu informācija">
           <div className="rich-side-card">
@@ -338,7 +406,7 @@ export function Checkout() {
           </div>
           <div className="rich-side-card rich-side-card--muted">
             <h2 className="rich-side-card__title">Ātras atbildes</h2>
-            <p className="rich-side-card__hint" style={{ marginBottom: "0.5rem" }}>
+            <p className="rich-side-card__hint rich-side-card__hint--tight">
               BUJ, atgriešana, piegādes izsekošana (simulācija).
             </p>
             <Link to={to("/informacija")} className="btn btn--small btn--block">
@@ -366,10 +434,15 @@ export function Checkout() {
   }
 
   return (
-    <>
-      {intro}
-      {summaryPanel}
+    <div className="checkout-page">
+      <div className="checkout-section">{intro}</div>
+      <section className="checkout-section" aria-labelledby="checkout-summary-h">
+        <h2 id="checkout-summary-h" className="checkout-section__title">
+          Pasūtījuma kopsavilkums
+        </h2>
+        <div className="panel panel--summary">{orderSummaryBody}</div>
+      </section>
       {formBlock}
-    </>
+    </div>
   );
 }

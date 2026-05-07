@@ -19,8 +19,16 @@ export function ProductCard({ product }) {
   const rating = 3 + (product.id % 3);
 
   return (
-    <article className={`product-card${isRich ? " product-card--rich" : ""}`}>
-      <Link to={to(`/produkts/${product.id}`)} className="product-card__link">
+    <article
+      className={`product-card${isRich ? " product-card--rich" : " product-card--a"}`}
+    >
+      <Link
+        to={to(`/produkts/${product.id}`)}
+        className="product-card__link"
+        aria-label={
+          isRich ? undefined : `${product.name}. Skatīt detaļas un cenu`
+        }
+      >
         <div className="product-card__media">
           {isRich && product.id % 4 === 0 ? (
             <span className="product-card__corner product-card__corner--new">
@@ -57,6 +65,9 @@ export function ProductCard({ product }) {
           ) : null}
           <p className="product-card__price">{formatEur(product.price)}</p>
           <p className="product-card__meta">Noliktavā</p>
+          {!isRich ? (
+            <span className="product-card__action">Skatīt</span>
+          ) : null}
           {isRich ? (
             <>
               <p className="product-card__ship">{shortLine(product.delivery, 56)}</p>

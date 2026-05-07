@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { categoryLabel, PRODUCTS } from "../../data/products.js";
 import { formatEur } from "../../lib/formatEur.js";
@@ -28,8 +28,13 @@ export function RichProductDetail({
   const to = usePrefixedTo();
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const [bundleImgFailed, setBundleImgFailed] = useState({});
   const rating = 3 + (product.id % 3);
   const oldPrice = decorativeOldPrice(product.price, product.id);
+
+  useEffect(() => {
+    setBundleImgFailed({});
+  }, [product.id]);
 
   const sidebarPicks = useMemo(() => {
     return PRODUCTS.filter(
@@ -133,29 +138,31 @@ export function RichProductDetail({
               />
             </div>
             <p className="rich-pdp__desc">{product.description}</p>
-            <div className="qty-field rich-pdp__qty">
-              <label htmlFor="qty">Daudzums</label>
-              <input
-                id="qty"
-                type="number"
-                min={1}
-                value={qty}
-                onChange={(e) =>
-                  setQty(Math.max(1, Math.floor(Number(e.target.value)) || 1))
-                }
-              />
-            </div>
-            <div className="rich-pdp__ctas">
-              <button type="button" className="btn rich-pdp__btn-main" onClick={handleAdd}>
-                Pievienot grozam
-              </button>
-              <button
-                type="button"
-                className="btn btn--ghost"
-                onClick={() => navigate(to("/grozs"))}
-              >
-                Atvērt grozu
-              </button>
+            <div className="rich-pdp__qty-row">
+              <div className="qty-field rich-pdp__qty">
+                <label htmlFor="qty">Daudzums</label>
+                <input
+                  id="qty"
+                  type="number"
+                  min={1}
+                  value={qty}
+                  onChange={(e) =>
+                    setQty(Math.max(1, Math.floor(Number(e.target.value)) || 1))
+                  }
+                />
+              </div>
+              <div className="rich-pdp__ctas rich-pdp__ctas--cluster">
+                <button type="button" className="btn rich-pdp__btn-main" onClick={handleAdd}>
+                  Pievienot grozam
+                </button>
+                <button
+                  type="button"
+                  className="btn btn--ghost"
+                  onClick={() => navigate(to("/grozs"))}
+                >
+                  Atvērt grozu
+                </button>
+              </div>
             </div>
             <Link to={to("/veikals")} className="link-quiet rich-pdp__back">
               ← Atpakaļ uz veikalu
@@ -233,30 +240,56 @@ export function RichProductDetail({
             Bieži pērk kopā (demonstrācija)
           </h2>
           <ul className="rich-pdp__bundle-list">
-            {bundle.map((p) => (
-              <li key={p.id}>
-                <span>{p.name}</span>
-                <span className="rich-pdp__bundle-price">{formatEur(p.price)}</span>
-                <button type="button" className="btn btn--small" onClick={() => addBundleItem(p)}>
-                  + Grozā
-                </button>
-              </li>
-            ))}
+            {bundle.map((p) => {
+              const bundleInitial = p.name.trim().charAt(0).toUpperCase();
+              const showBundlePhoto = p.image && !bundleImgFailed[p.id];
+              return (
+                <li key={p.id}>
+                  <span className="rich-pdp__bundle-thumb">
+                    {showBundlePhoto ? (
+                      <img
+                        src={p.image}
+                        alt=""
+                        loading="lazy"
+                        decoding="async"
+                        onError={() =>
+                          setBundleImgFailed((prev) => ({ ...prev, [p.id]: true }))
+                        }
+                      />
+                    ) : (
+                      <span className="rich-pdp__bundle-thumb-ph" aria-hidden="true">
+                        {bundleInitial}
+                      </span>
+                    )}
+                  </span>
+                  <span className="rich-pdp__bundle-name">{p.name}</span>
+                  <span className="rich-pdp__bundle-price">{formatEur(p.price)}</span>
+                  <button type="button" className="btn btn--small" onClick={() => addBundleItem(p)}>
+                    + Grozā
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
 
       {related.length > 0 ? (
         <section className="rich-pdp__related" aria-labelledby="rel-h">
-          <div className="rich-pdp__related-head">
-            <h2 id="rel-h" className="rich-section__title">
-              Jums varētu patikt arī
-            </h2>
-            <Link to={to("/veikals")} className="rich-pdp__related-more">
-              Visas preces →
-            </Link>
-          </div>
-          <div className="rich-product-wall">
+          <header className="rich-pdp__related-head">
+            <div className="rich-pdp__related-head-main">
+              <h2 id="rel-h" className="rich-section__title rich-pdp__related-title">
+                Jums varētu patikt arī
+              </h2>
+              <Link to={to("/veikals")} className="btn btn--small btn--ghost rich-pdp__related-all">
+                Visas preces →
+              </Link>
+            </div>
+            <p className="rich-pdp__related-lead">
+              Ieteikumi no kataloga — turpiniet iepirkšanos vai atveriet pilnu sortimentu.
+            </p>
+          </header>
+          <div className="rich-product-wall rich-product-wall--pdp-related">
             {related.map((p) => (
               <RichProductCard key={p.id} product={p} compact />
             ))}

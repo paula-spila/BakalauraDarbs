@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { usePrefixedTo } from "../context/VariantContext.jsx";
+import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
+import { RichArticleShell } from "../variants/rich/RichArticleShell.jsx";
 
 export function Kontakti() {
   const to = usePrefixedTo();
+  const { isRich } = useVariant();
   const [sent, setSent] = useState(false);
 
   function handleSubmit(e) {
@@ -11,7 +13,7 @@ export function Kontakti() {
     setSent(true);
   }
 
-  return (
+  const body = (
     <div className="text-page text-page--split">
       <div>
         <h1 className="page-title">Kontakti</h1>
@@ -72,4 +74,12 @@ export function Kontakti() {
       </div>
     </div>
   );
+
+  if (isRich) {
+    return (
+      <RichArticleShell currentLabel="Kontakti">{body}</RichArticleShell>
+    );
+  }
+
+  return body;
 }

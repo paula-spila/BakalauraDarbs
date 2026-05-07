@@ -1,241 +1,269 @@
 import { Link } from "react-router-dom";
 import { PRODUCT_CATEGORIES, PRODUCTS } from "../../data/products.js";
+import {
+  HOME_CATEGORY_BLURB,
+  HOME_FEATURED_PRODUCT_IDS,
+  HOME_HELP_PROMO,
+  HOME_HERO,
+  HOME_TRUST_POINTS,
+} from "../../data/homePageShared.js";
+
+/** Papildu ID tikai B sākumlapai — 8 ieteiktās kartītes (2 pilnas rindas), nemainot A variantu. */
+const RICH_HOME_EXTRA_FEATURED_IDS = [5, 11, 1, 3, 4];
 import { RichProductCard } from "./RichProductCard.jsx";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
 
-const BEST_IDS = [3, 7, 12, 18, 22];
-const DEAL_IDS = [4, 9, 15, 21];
+function SvgIcon({ children }) {
+  return (
+    <svg
+      className="rich-value-meta__svg"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.75"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden="true"
+    >
+      {children}
+    </svg>
+  );
+}
 
-const categoryBlurb = {
-  "virtuve-un-galds": "Trauki un virtuve",
-  "vanna-un-kopsana": "Vanna un higiēna",
-  "maja-un-uzglabasana": "Māja un kārtība",
-  "kanceleja-un-somas": "Kanceleja un somas",
-};
+const VALUE_META = [
+  {
+    label: "Piegādes laiks",
+    value: "2–3 darba dienas",
+    icon: (
+      <SvgIcon>
+        <circle cx="12" cy="12" r="9" />
+        <path d="M12 7v5l3 2" />
+      </SvgIcon>
+    ),
+  },
+  {
+    label: "Veikala komanda",
+    value: "Atbalsts darba dienās",
+    icon: (
+      <SvgIcon>
+        <path d="M12 11a3 3 0 1 0-3-3 3 3 0 0 0 3 3Z" />
+        <path d="M5.5 20a6.5 6.5 0 0 1 13 0" />
+      </SvgIcon>
+    ),
+  },
+  {
+    label: "Izvēles līmenis",
+    value: "Skaidras kategorijas",
+    icon: (
+      <SvgIcon>
+        <path d="M4 19h16" />
+        <path d="M7 16l3-8 4 5 3-6" />
+      </SvgIcon>
+    ),
+  },
+  {
+    label: "Atgriešanas logs",
+    value: "14 dienu garantija",
+    icon: (
+      <SvgIcon>
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M3 10h18M8 3v4M16 3v4" />
+      </SvgIcon>
+    ),
+  },
+];
 
 /**
- * Version B home — not the same composition as Version A (no dark hero band).
+ * Dense (/rich) home — same sections and catalogue highlights as the minimal home,
+ * with richer layout, colour, cards, and decorative chrome only under `.variant-rich`.
  */
 export function RichHomePage() {
   const to = usePrefixedTo();
-  const best = BEST_IDS.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
-  const deals = DEAL_IDS.map((id) => PRODUCTS.find((p) => p.id === id)).filter(Boolean);
+  const featuredIds = [
+    ...new Set([...HOME_FEATURED_PRODUCT_IDS, ...RICH_HOME_EXTRA_FEATURED_IDS]),
+  ];
+  const featured = featuredIds
+    .map((id) => PRODUCTS.find((p) => p.id === id))
+    .filter(Boolean);
 
   return (
     <div className="rich-startpage">
-      <section className="rich-hero-market" aria-labelledby="rh-main">
+      <div className="rich-startpage__deco" aria-hidden="true">
+        <span className="rich-deco-orb rich-deco-orb--1" />
+        <span className="rich-deco-orb rich-deco-orb--2" />
+        <span className="rich-deco-orb rich-deco-orb--3" />
+      </div>
+      <section
+        className="rich-hero-market rich-hero-market--vibrant"
+        aria-labelledby="rh-main"
+      >
         <div className="rich-hero-market__main">
-          <p className="rich-hero-market__eyebrow">Nedēļas izpārdošana · demonstrācija</p>
+          <p className="rich-hero-market__eyebrow">{HOME_HERO.kicker}</p>
           <h1 id="rh-main" className="rich-hero-market__title">
-            Līdz −20% atlasītām precēm + bezmaksas piegāde virs 35 €
+            {HOME_HERO.title}
           </h1>
-          <p className="rich-hero-market__lead">
-            Virtuve, vanna, uzglabāšana, kanceleja — viss mājai. Tās pašas cenas un uzdevumi
-            kā minimālajā versijā; šeit tikai cits vizuālais izkārtojums.
-          </p>
+          <p className="rich-hero-market__lead">{HOME_HERO.lead}</p>
           <div className="rich-hero-market__ctas">
-            <Link to={to("/veikals")} className="btn rich-hero-btn rich-hero-btn--primary">
-              Skatīt akcijas preces
-            </Link>
-            <Link to={to("/veikals?k=virtuve-un-galds")} className="btn rich-hero-btn rich-hero-btn--ghost">
-              Virtuve
-            </Link>
-            <Link to={to("/informacija#piegade")} className="btn rich-hero-btn rich-hero-btn--ghost">
+            <Link
+              to={to("/informacija#piegade")}
+              className="btn rich-hero-btn rich-hero-btn--ghost rich-hero-btn--loud"
+            >
               Piegāde
+            </Link>
+            <Link
+              to={to("/par-mums")}
+              className="btn rich-hero-btn rich-hero-btn--ghost rich-hero-btn--loud rich-hero-btn--accent"
+            >
+              Par veikalu
             </Link>
           </div>
         </div>
-        <div className="rich-hero-market__cards" aria-label="Īsie piedāvājumi">
-          <Link to={to("/veikals")} className="rich-mini-promo rich-mini-promo--hot">
-            <span className="rich-mini-promo__tag">Karsti</span>
-            <strong>Populārākās</strong>
-            <span className="rich-mini-promo__sub">Skatīt top preces</span>
-          </Link>
-          <Link to={to("/piegade")} className="rich-mini-promo rich-mini-promo--ship">
-            <span className="rich-mini-promo__tag">Ātri</span>
-            <strong>2–3 dienas</strong>
-            <span className="rich-mini-promo__sub">Piegādes info</span>
-          </Link>
-          <Link to={to("/kontakti")} className="rich-mini-promo rich-mini-promo--help">
-            <span className="rich-mini-promo__tag">Palīdzība</span>
-            <strong>Kontakti</strong>
-            <span className="rich-mini-promo__sub">Darba dienās</span>
-          </Link>
+        <div className="rich-hero-market__visual" aria-hidden="true">
+          <div className="rich-hero-visual__collage">
+            <div className="rich-hero-visual__polaroid rich-hero-visual__polaroid--a">
+              <div className="rich-hero-visual__polaroid-inner">
+                <div className="rich-hero-visual__ph" />
+                <div className="rich-hero-visual__stickers">
+                  <span className="rich-hero-visual__sticker rich-hero-visual__sticker--price">
+                    no 11,00 €
+                  </span>
+                  <span className="rich-hero-visual__sticker rich-hero-visual__sticker--ship">
+                    2–3 d.d.
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="rich-hero-visual__polaroid rich-hero-visual__polaroid--b">
+              <div className="rich-hero-visual__polaroid-inner">
+                <div className="rich-hero-visual__ph" />
+                <div className="rich-hero-visual__stickers">
+                  <span className="rich-hero-visual__sticker rich-hero-visual__sticker--new">
+                    Jauns
+                  </span>
+                  <span className="rich-hero-visual__sticker rich-hero-visual__sticker--cart">
+                    Grozs +
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div className="rich-hero-visual__polaroid rich-hero-visual__polaroid--c">
+              <div className="rich-hero-visual__polaroid-inner">
+                <div className="rich-hero-visual__ph" />
+                <div className="rich-hero-visual__stickers">
+                  <span className="rich-hero-visual__sticker">−15%</span>
+                  <span className="rich-hero-visual__sticker rich-hero-visual__sticker--ship">
+                    Bezmaksas virs 35 €
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <p className="rich-hero-visual__caption">Demonstrācijas attēlu vietturi</p>
         </div>
-      </section>
-
-      <div className="rich-ticker" role="presentation">
-        <span>★ Bezmaksas piegāde no 35 €</span>
-        <span>·</span>
-        <span>14 dienu atgriešana</span>
-        <span>·</span>
-        <span>Droša apmaksa (simulācija)</span>
-        <span>·</span>
-        <span>40+ preces katalogā</span>
-      </div>
-
-      <section className="rich-spotlight" aria-label="Īpašie piedāvājumi">
-        <Link to={to("/veikals")} className="rich-spotlight__card rich-spotlight__card--indigo">
-          <span className="rich-spotlight__tag">Jaunumi</span>
-          <span className="rich-spotlight__title">Virtuve un galds</span>
-          <span className="rich-spotlight__sub">Trauki un ikdienas sīkumi</span>
-        </Link>
-        <Link to={to("/veikals?k=vanna-un-kopsana")} className="rich-spotlight__card rich-spotlight__card--teal">
-          <span className="rich-spotlight__tag">Top</span>
-          <span className="rich-spotlight__title">Vanna un kopšana</span>
-          <span className="rich-spotlight__sub">Dvieļi un higiēna</span>
-        </Link>
-        <Link to={to("/veikals")} className="rich-spotlight__card rich-spotlight__card--orange">
-          <span className="rich-spotlight__tag">Akcija</span>
-          <span className="rich-spotlight__title">Nedēļas izpārdošana</span>
-          <span className="rich-spotlight__sub">Atlasītas preces katalogā</span>
-        </Link>
-        <Link to={to("/piegade")} className="rich-spotlight__card rich-spotlight__card--violet">
-          <span className="rich-spotlight__tag">Ātri</span>
-          <span className="rich-spotlight__title">Piegāde 2–3 dienas</span>
-          <span className="rich-spotlight__sub">Noteikumi un BUJ</span>
+        <Link
+          to={to("/veikals")}
+          className="btn rich-hero-btn rich-hero-btn--primary rich-hero-btn--loud rich-hero-market__cta-primary"
+        >
+          Iepirkties tagad
         </Link>
       </section>
 
-      <div className="rich-trust-band" role="presentation">
-        <div className="rich-trust-band__item">
-          <span className="rich-trust-band__icon" aria-hidden="true">
-            ✓
-          </span>
-          <span>Droša apmaksa (simulācija) — SSL demonstrācija</span>
-        </div>
-        <div className="rich-trust-band__item">
-          <span className="rich-trust-band__icon" aria-hidden="true">
-            🚚
-          </span>
-          <span>Piegāde visā Latvijā — 2–3 darba dienas</span>
-        </div>
-        <div className="rich-trust-band__item">
-          <span className="rich-trust-band__icon" aria-hidden="true">
-            ↩
-          </span>
-          <span>14 dienu atgriešana (noteikumi katalogā)</span>
-        </div>
-        <div className="rich-trust-band__item">
-          <span className="rich-trust-band__icon" aria-hidden="true">
-            ★
-          </span>
-          <span>40+ preces — virtuve, māja, kanceleja</span>
-        </div>
-      </div>
+      <aside
+        className="rich-promo-sash"
+        aria-label="Akcijas josla (dekoratīva demonstrācija)"
+      >
+        <span className="rich-promo-sash__badge">−15%</span>
+        <span className="rich-promo-sash__text">
+          Atlasītām precēm šajā nedēļā — bezmaksas piegāde no 35 € visā Latvijā
+        </span>
+        <Link to={to("/veikals")} className="rich-promo-sash__cta">
+          Atvērt katalogu
+        </Link>
+      </aside>
 
-      <nav className="rich-popcats" aria-label="Populārākās kategorijas">
-        {PRODUCT_CATEGORIES.map((c) => (
-          <Link
-            key={c.id}
-            className="rich-popcats__item"
-            to={`${to("/veikals")}?k=${encodeURIComponent(c.id)}`}
-          >
-            <span className="rich-popcats__name">{c.label}</span>
-            <span className="rich-popcats__desc">{categoryBlurb[c.id] ?? ""}</span>
-          </Link>
+      <section className="rich-trust-band rich-trust-band--bold" aria-label="Ieguvumi">
+        {HOME_TRUST_POINTS.map((text, i) => (
+          <div key={text} className="rich-trust-band__item">
+            <span className="rich-trust-band__icon" aria-hidden="true">
+              {["✓", "🚚", "↩"][i] ?? "★"}
+            </span>
+            <span>{text}</span>
+          </div>
         ))}
-      </nav>
-
-      <section className="rich-section" aria-labelledby="best-h">
-        <div className="rich-section__head">
-          <h2 id="best-h" className="rich-section__title">
-            Visvairāk pirktās
-          </h2>
-          <Link to={to("/veikals")} className="rich-section__link">
-            Veikals →
-          </Link>
-        </div>
-        <div className="rich-product-wall">
-          {best.map((p) => (
-            <RichProductCard key={p.id} product={p} compact />
-          ))}
-        </div>
       </section>
 
-      <section className="rich-section rich-section--accent" aria-labelledby="deal-h">
-        <div className="rich-section__head">
-          <h2 id="deal-h" className="rich-section__title">
-            Nedēļas piedāvājumi
-          </h2>
-          <span className="rich-section__badge">Akcijas zona</span>
-        </div>
-        <div className="rich-product-wall rich-product-wall--dense">
-          {deals.map((p) => (
-            <RichProductCard key={p.id} product={p} compact />
+      <section className="rich-value-meta" aria-label="Īsie pakalpojuma dati">
+        <ul className="rich-value-meta__list">
+          {VALUE_META.map((row) => (
+            <li key={row.label} className="rich-value-meta__item">
+              <span className="rich-value-meta__icon-wrap">{row.icon}</span>
+              <span className="rich-value-meta__label">{row.label}</span>
+              <span className="rich-value-meta__value">{row.value}</span>
+            </li>
           ))}
-        </div>
+        </ul>
       </section>
 
-      <section className="rich-section" aria-labelledby="cat-h">
-        <h2 id="cat-h" className="rich-section__title rich-section__title--solo">
-          Kategorijas ar īsiem aprakstiem
+      <section className="rich-section rich-section--cats" aria-labelledby="cats-title">
+        <h2 id="cats-title" className="rich-section__title rich-section__title--solo">
+          Iepirkt pēc kategorijas
         </h2>
-        <div className="rich-cat-grid">
+        <div className="rich-cat-grid rich-cat-grid--showcase">
           {PRODUCT_CATEGORIES.map((c) => (
             <Link
               key={c.id}
-              className="rich-cat-card"
+              className="rich-cat-card rich-cat-card--showcase"
               to={`${to("/veikals")}?k=${encodeURIComponent(c.id)}`}
+              data-rich-cat={c.id}
             >
+              <div className="rich-cat-card__media" aria-hidden="true">
+                <span className="rich-cat-card__ph-initial">
+                  {c.label.trim().charAt(0)}
+                </span>
+              </div>
+              <span className="rich-cat-card__badge">Kategorija</span>
               <span className="rich-cat-card__name">{c.label}</span>
+              <span className="rich-cat-card__desc">
+                {HOME_CATEGORY_BLURB[c.id] ?? "Skatīt preces"}
+              </span>
               <span className="rich-cat-card__go">Skatīt preces →</span>
             </Link>
           ))}
         </div>
       </section>
 
-      <section className="rich-section" aria-labelledby="feat-h">
+      <section className="rich-section rich-section--featured" aria-labelledby="feat-title">
         <div className="rich-section__head">
-          <h2 id="feat-h" className="rich-section__title">
-            Ieteiktās šodien
+          <h2 id="feat-title" className="rich-section__title">
+            Ieteiktās preces
           </h2>
+          <Link to={to("/veikals")} className="rich-section__link rich-section__link--cta">
+            Skatīt visu
+          </Link>
         </div>
         <div className="rich-product-wall">
-          {[2, 8, 16]
-            .map((id) => PRODUCTS.find((p) => p.id === id))
-            .filter(Boolean)
-            .map((p) => (
-              <RichProductCard key={p.id} product={p} compact />
-            ))}
+          {featured.map((p) => (
+            <RichProductCard key={p.id} product={p} compact />
+          ))}
         </div>
       </section>
 
-      <section className="rich-nl" aria-labelledby="nl-h">
-        <div className="rich-nl__grid">
+      <section className="rich-help-ribbon" aria-labelledby="help-title">
+        <div className="rich-help-ribbon__inner">
           <div>
-            <h2 id="nl-h" className="rich-section__title" style={{ margin: 0 }}>
-              Atlaides e-pastā
+            <h2 id="help-title" className="rich-help-ribbon__title">
+              {HOME_HELP_PROMO.title}
             </h2>
-            <p className="muted" style={{ margin: "0.4rem 0 0", fontSize: "0.88rem" }}>
-              Demonstrācija — netiek sūtīts. Tikai vizuāls bloks.
-            </p>
+            <p className="rich-help-ribbon__lead muted">{HOME_HELP_PROMO.lead}</p>
           </div>
-          <form
-            className="rich-nl__form"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <input type="email" placeholder="jūsu@epasts.lv" aria-label="E-pasts" />
-            <button type="submit" className="btn">
-              Pierakstīties
-            </button>
-          </form>
-        </div>
-      </section>
-
-      <section className="rich-helpbar" aria-labelledby="help-h">
-        <h2 id="help-h" className="visually-hidden">
-          Palīdzība
-        </h2>
-        <div className="rich-helpbar__inner">
-          <p className="rich-helpbar__text">
-            Jautājumi par pasūtījumu?{" "}
-            <Link to={to("/informacija")}>BUJ</Link> ·{" "}
-            <Link to={to("/kontakti")}>Kontakti</Link> ·{" "}
-            <Link to={to("/piegade")}>Piegāde</Link>
-          </p>
+          <div className="rich-help-ribbon__actions">
+            <Link to={to("/kontakti")} className="btn rich-help-ribbon__btn">
+              Kontakti
+            </Link>
+            <Link to={to("/informacija")} className="btn btn--ghost rich-help-ribbon__btn">
+              Informācija
+            </Link>
+          </div>
         </div>
       </section>
     </div>

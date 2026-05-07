@@ -252,7 +252,9 @@ export function Shop() {
           </fieldset>
         </div>
         <p className="rich-filter-tip">
-          <Link to={to("/informacija#piegade")}>Piegādes informācija →</Link>
+          <Link to={to("/informacija#piegade")} className="rich-filter-tip__link">
+            Piegādes informācija
+          </Link>
         </p>
       </aside>
 
@@ -264,12 +266,12 @@ export function Shop() {
             {qParam ? (
               <>
                 {" "}
-                meklēšanai «<strong>{qParam}</strong>»
+                · «<strong>{qParam}</strong>»
               </>
             ) : null}
           </p>
           <label className="rich-shop-sort">
-            <span className="rich-shop-sort__lab">Kārtot</span>
+            <span className="rich-shop-sort__lab">Kārtot pēc</span>
             <select
               value={sortKey}
               onChange={(e) => setSortKey(e.target.value)}
@@ -283,12 +285,7 @@ export function Shop() {
           </label>
         </div>
 
-        <p className="rich-shop-lead">
-          Filtri kreisajā pusē; meklēšanai lietojiet lodziņu lapas augšpusē. Cenas kā
-          katalogā.
-        </p>
-
-        <div className="rich-shop-inline-promo" role="presentation">
+        <div className="rich-shop-inline-promo rich-shop-inline-promo--compact" role="presentation">
           <span className="rich-shop-inline-promo__tag">Akcijas zona</span>
           <span>
             Bezmaksas piegāde pasūtījumiem virs <strong>35,00 €</strong> (demonstrācija).
@@ -314,40 +311,29 @@ export function Shop() {
             vai <Link to={to("/veikals")}>atvērt veikalu</Link>
           </p>
         ) : (
-          <div className="rich-product-grid">
+          <div className="rich-product-shelf" role="list">
             {sorted.map((p) => (
-              <RichProductCard key={p.id} product={p} compact />
+              <div key={p.id} className="rich-product-shelf__row" role="listitem">
+                <RichProductCard product={p} shelf />
+              </div>
             ))}
           </div>
         )}
       </div>
 
-      <aside className="rich-shop-rail" aria-label="Piedāvājumi un palīdzība">
-        <div className="rich-rail-card rich-rail-card--promo">
-          <p className="rich-rail-card__eyebrow">Sezonas izpārdošana</p>
+      <aside className="rich-shop-rail" aria-label="Īsi fakti un palīdzība">
+        <div className="rich-rail-card rich-rail-card--rail-quiet">
+          <h2 className="rich-rail-card__title rich-rail-card__title--strong">Ātri fakti</h2>
           <p className="rich-rail-card__p">
-            Atlasītām precēm īpašas cenas katalogā. Bezmaksas piegāde virs{" "}
-            <strong>35,00 €</strong> (demonstrācija).
+            Standarta piegāde: <strong>2–3 darba dienas</strong>. Dažām precēm{" "}
+            <strong>5–7 darba dienas</strong> — izmantojiet filtru kreisajā pusē.
+          </p>
+          <p className="rich-rail-card__p rich-rail-card__p--tight">
+            Bezmaksas piegāde demonstrācijā no <strong>35,00 €</strong>.
           </p>
         </div>
-        <div className="rich-rail-card">
-          <h2 className="rich-rail-card__title">Ātri fakti</h2>
-          <p className="rich-rail-card__p">
-            Standarta piegāde: <strong>2–3 darba dienas</strong>.
-          </p>
-          <p className="rich-rail-card__p">
-            Dažām precēm — <strong>5–7 darba dienas</strong>; filtrējiet kreisajā pusē.
-          </p>
-        </div>
-        <div className="rich-rail-card rich-rail-card--accent">
-          <h2 className="rich-rail-card__title">Palīdzība</h2>
-          <p className="rich-rail-card__p">
-            <Link to={to("/kontakti")}>Kontakti</Link> ·{" "}
-            <Link to={to("/informacija")}>BUJ</Link>
-          </p>
-        </div>
-        <div className="rich-rail-card">
-          <h2 className="rich-rail-card__title">Top preces</h2>
+        <div className="rich-rail-card rich-rail-card--rail-quiet">
+          <h2 className="rich-rail-card__title rich-rail-card__title--strong">Top preces</h2>
           <ul className="rich-rail-mini">
             {RAIL_BEST_IDS.map((id) => {
               const p = PRODUCTS.find((x) => x.id === id);
@@ -361,33 +347,24 @@ export function Shop() {
             })}
           </ul>
         </div>
-        <div className="rich-rail-card">
-          <h2 className="rich-rail-card__title">BUJ saīsne</h2>
-          <p className="rich-rail-card__p">
-            Atgriešana, piegāde, pasūtījuma maiņa —{" "}
-            <Link to={to("/informacija#buj")}>atvērt jautājumus</Link>.
-          </p>
-        </div>
-        <div className="rich-rail-card rich-rail-card--nl">
-          <h2 className="rich-rail-card__title">Jaunumi e-pastā</h2>
-          <p className="rich-rail-card__fine">Demonstrācija — netiek sūtīts.</p>
-          <form
-            className="rich-rail-nl"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
-          >
-            <input type="email" placeholder="jūsu@epasts.lv" aria-label="E-pasts" />
-            <button type="submit" className="btn btn--small">
-              Pierakstīties
-            </button>
-          </form>
-        </div>
-        <div className="rich-rail-card">
-          <h2 className="rich-rail-card__title">Piegāde</h2>
-          <Link to={to("/piegade")} className="btn btn--small btn--block">
-            Skatīt noteikumus
-          </Link>
+        <div className="rich-rail-card rich-rail-card--rail-quiet rich-rail-card--support">
+          <h2 className="rich-rail-card__title rich-rail-card__title--strong">
+            Palīdzība un BUJ
+          </h2>
+          <ul className="rich-rail-support-list">
+            <li>
+              <Link to={to("/informacija#buj")}>Biežāk uzdotie jautājumi</Link>
+            </li>
+            <li>
+              <Link to={to("/informacija#piegade")}>Piegāde un atgriešana</Link>
+            </li>
+            <li>
+              <Link to={to("/kontakti")}>Kontakti</Link>
+            </li>
+            <li>
+              <Link to={to("/informacija")}>Visa informācijas lapa</Link>
+            </li>
+          </ul>
         </div>
       </aside>
     </div>
@@ -395,7 +372,11 @@ export function Shop() {
 
   return (
     <>
-      <p className="breadcrumb">
+      <p
+        className={
+          isRich ? "breadcrumb breadcrumb--rich-shop" : "breadcrumb"
+        }
+      >
         <Link to={to("/")}>Sākums</Link>
         <span aria-hidden="true"> / </span>
         <span className="breadcrumb__current">Veikals</span>
@@ -403,7 +384,7 @@ export function Shop() {
       <div className="page-intro">
         <h1 className="page-title">Veikals</h1>
         {!isRich ? (
-          <p className="page-intro__sub">
+          <p className="lead page-intro__lead">
             {filtered.length} {filtered.length === 1 ? "prece" : "preces"}
             {qParam ? (
               <>
@@ -411,11 +392,7 @@ export function Shop() {
                 meklēšanai «<strong>{qParam}</strong>»
               </>
             ) : null}
-          </p>
-        ) : null}
-        {!isRich ? (
-          <p className="lead page-intro__lead">
-            Filtri pēc kategorijas; meklēšanai lietojiet lodziņu lapas augšpusē.
+            . Kategorijas zemāk; meklēšanai — augšējā joslā.
           </p>
         ) : null}
       </div>

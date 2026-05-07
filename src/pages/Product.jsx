@@ -18,10 +18,19 @@ export function Product() {
 
   const related = useMemo(() => {
     if (!product) return [];
-    return PRODUCTS.filter(
+    const sameCat = PRODUCTS.filter(
       (p) => p.categoryId === product.categoryId && p.id !== product.id,
-    ).slice(0, 3);
-  }, [product]);
+    );
+    const want = isRich ? 5 : 3;
+    let out = sameCat.slice(0, want);
+    if (isRich && out.length < want) {
+      const extra = PRODUCTS.filter(
+        (p) => p.id !== product.id && !out.some((x) => x.id === p.id),
+      );
+      out = [...out, ...extra].slice(0, want);
+    }
+    return out;
+  }, [product, isRich]);
 
   const bundle = useMemo(() => {
     if (!product) return [];
@@ -113,20 +122,22 @@ export function Product() {
           <h1 className="page-title page-title--product">{product.name}</h1>
           <p className="detail__price">{formatEur(product.price)}</p>
           <p className="detail__desc">{product.description}</p>
-          <ul className="detail-meta">
-            <li>
-              <strong>Materiāls:</strong> {product.material}
-            </li>
-            <li>
-              <strong>Izmērs / tilpums:</strong> {product.size}
-            </li>
-            <li>
-              <strong>Krāsa:</strong> {product.color}
-            </li>
-            <li>
-              <strong>Piegāde:</strong> {product.delivery}
-            </li>
-          </ul>
+          <div className="detail-spec">
+            <ul className="detail-meta">
+              <li>
+                <strong>Materiāls:</strong> {product.material}
+              </li>
+              <li>
+                <strong>Izmērs / tilpums:</strong> {product.size}
+              </li>
+              <li>
+                <strong>Krāsa:</strong> {product.color}
+              </li>
+              <li>
+                <strong>Piegāde:</strong> {product.delivery}
+              </li>
+            </ul>
+          </div>
           <div className="qty-field">
             <label htmlFor="qty">Daudzums</label>
             <input
@@ -139,11 +150,11 @@ export function Product() {
               }
             />
           </div>
-          <div className="actions-row">
-            <button type="button" className="btn" onClick={handleAdd}>
+          <div className="actions-row detail__actions">
+            <button type="button" className="btn btn--primary-pdp" onClick={handleAdd}>
               Pievienot grozam
             </button>
-            <Link to={to("/veikals")} className="link-quiet">
+            <Link to={to("/veikals")} className="link-quiet link-quiet--pdp-back">
               Atpakaļ uz veikalu
             </Link>
           </div>

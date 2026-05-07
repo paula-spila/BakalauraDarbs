@@ -1,9 +1,12 @@
 import { Link } from "react-router-dom";
-import { usePrefixedTo } from "../context/VariantContext.jsx";
+import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
+import { RichArticleShell } from "../variants/rich/RichArticleShell.jsx";
 
 export function Noteikumi() {
   const to = usePrefixedTo();
-  return (
+  const { isRich } = useVariant();
+
+  const body = (
     <article className="text-page">
       <h1 className="page-title">Noteikumi</h1>
       <p className="lead">
@@ -40,4 +43,12 @@ export function Noteikumi() {
       </div>
     </article>
   );
+
+  if (isRich) {
+    return (
+      <RichArticleShell currentLabel="Noteikumi">{body}</RichArticleShell>
+    );
+  }
+
+  return body;
 }

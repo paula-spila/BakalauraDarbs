@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams, useLocation } from "react-router-dom";
-import { usePrefixedTo } from "../context/VariantContext.jsx";
+import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
 
 export function HeaderSearch() {
   const [q, setQ] = useState("");
@@ -8,6 +8,7 @@ export function HeaderSearch() {
   const [searchParams] = useSearchParams();
   const { pathname } = useLocation();
   const to = usePrefixedTo();
+  const { isRich } = useVariant();
   const onShop =
     pathname === "/veikals" ||
     pathname === "/rich/veikals" ||
@@ -31,7 +32,7 @@ export function HeaderSearch() {
 
   return (
     <form
-      className="header-search"
+      className={`header-search${isRich ? " header-search--rich" : ""}`}
       role="search"
       onSubmit={handleSubmit}
       aria-label="Meklēt preces"

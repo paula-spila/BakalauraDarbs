@@ -3,15 +3,16 @@ import { pathsForVariantToggle } from "../lib/variantPaths.js";
 
 /**
  * Version A (minimal) ↔ Version B (rich), same tab. Preserves path + query.
- * @param {"floating" | "inline" | "header"} placement — header = mazs A/B labajā augšējā stūrī
+ * @param {"floating" | "inline" | "header" | "corner"} placement — corner = fiksēti kreisajā augšējā stūrī (ārpus veikala UI)
  */
 export function VariantSegmentToggle({ placement = "floating" }) {
   const { pathname, search } = useLocation();
   const { pathA, pathB } = pathsForVariantToggle(pathname, search);
   const isFloating = placement === "floating";
   const isHeader = placement === "header";
+  const isCorner = placement === "corner";
 
-  if (isHeader) {
+  if (isHeader || isCorner) {
     return (
       <div
         className="variant-segment variant-segment--header"

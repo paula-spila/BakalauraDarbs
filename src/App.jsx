@@ -1,5 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout.jsx";
+import { VariantSegmentToggle } from "./components/VariantSegmentToggle.jsx";
 import { RichLayout } from "./variants/rich/RichLayout.jsx";
 import { Home } from "./pages/Home.jsx";
 import { Shop } from "./pages/Shop.jsx";
@@ -38,6 +39,9 @@ function storeRouteList() {
 export default function App() {
   return (
     <>
+      <div className="variant-ab-host">
+        <VariantSegmentToggle placement="corner" />
+      </div>
       <Routes>
       <Route path="/rich/*" element={<RichLayout />}>
         {storeRouteList()}
