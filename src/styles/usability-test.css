@@ -1,0 +1,242 @@
+/* Neitrāls testa UI — vienāds A un B variantā; neietekmē veikala tēmas tokenus */
+
+body.usability-test-active .variant-ab-host {
+  display: none;
+}
+
+.usability-legal-page {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  padding: var(--space-4) var(--space-3) var(--space-6);
+  background: var(--bg);
+}
+
+.usability-legal-page__inner {
+  width: min(40rem, 100%);
+}
+
+.usability-legal-page__inner .page-title {
+  margin-top: 0;
+}
+
+.usability-legal-page__actions {
+  margin-top: var(--space-3);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.usability-consent {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  margin: var(--space-3) 0;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.usability-consent input {
+  margin-top: 0.2rem;
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+}
+
+.usability-hint {
+  margin-top: var(--space-4);
+  font-size: var(--font-sm);
+}
+
+.usability-callout {
+  padding: var(--space-3);
+  border-radius: var(--radius);
+  margin-bottom: var(--space-3);
+  border: 1px solid var(--border);
+}
+
+.usability-callout--info {
+  background: var(--surface);
+}
+
+.usability-callout--warn {
+  background: #fffbeb;
+  border-color: #fcd34d;
+  color: #78350f;
+}
+
+.usability-complete__meta {
+  margin: var(--space-3) 0;
+}
+
+.usability-complete__export {
+  margin-top: var(--space-4);
+}
+
+.usability-panel {
+  position: fixed;
+  right: max(0.75rem, env(safe-area-inset-right, 0px));
+  bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+  z-index: 99990;
+  width: min(22rem, calc(100vw - 1.5rem));
+  max-height: min(70vh, 32rem);
+  overflow: auto;
+  padding: var(--space-3);
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+  box-shadow:
+    0 1px 0 rgb(255 255 255 / 0.9) inset,
+    0 12px 40px rgb(15 23 42 / 0.18);
+  font-size: 0.875rem;
+  line-height: 1.45;
+}
+
+.usability-panel--min {
+  max-height: none;
+  width: auto;
+  min-width: 12rem;
+  padding: var(--space-2) var(--space-3);
+}
+
+.usability-panel__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin-bottom: var(--space-2);
+}
+
+.usability-panel__badge {
+  font-size: 0.65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: #475569;
+}
+
+.usability-panel__min-btn {
+  font: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid #94a3b8;
+  background: #fff;
+  color: #334155;
+  cursor: pointer;
+}
+
+.usability-panel__min-btn:hover {
+  background: #e2e8f0;
+}
+
+.usability-panel__meta {
+  display: grid;
+  gap: 0.5rem 1rem;
+  margin: 0 0 var(--space-2);
+  font-size: 0.8rem;
+}
+
+.usability-panel__meta dt {
+  margin: 0;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.usability-panel__meta dd {
+  margin: 0;
+  font-weight: 600;
+  color: #0f172a;
+}
+
+.usability-panel__progress {
+  margin: 0 0 var(--space-2);
+  font-size: 0.78rem;
+  color: #475569;
+}
+
+.usability-panel__task-title {
+  margin: 0 0 0.35rem;
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.usability-panel__task-text {
+  margin: 0;
+  font-size: 0.82rem;
+  color: #334155;
+}
+
+.usability-panel__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+  margin-top: var(--space-3);
+}
+
+.usability-panel__btn {
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+}
+
+.usability-panel .btn {
+  border-color: #94a3b8;
+  background: #fff;
+  color: #0f172a;
+}
+
+.usability-panel .btn:not(:disabled):hover {
+  background: #f1f5f9;
+}
+
+.usability-panel .btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.usability-panel__peek {
+  margin: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: #334155;
+}
+
+.variant-rich .usability-legal-page {
+  background: transparent;
+  color: var(--text);
+}
+
+.variant-rich .usability-legal-page .page-title {
+  color: #fff7fb;
+  text-shadow: 0 1px 2px rgb(0 0 0 / 0.25);
+}
+
+.variant-rich .usability-legal-page__inner > p {
+  color: #e8dce0;
+}
+
+.variant-rich .usability-consent {
+  color: #fce7f3;
+}
+
+.variant-rich .usability-hint,
+.variant-rich .usability-hint a {
+  color: #c4a8b0;
+}
+
+.variant-rich .usability-callout--info {
+  background: rgb(255 255 255 / 0.08);
+  border-color: rgb(255 255 255 / 0.15);
+  color: #fce7f3;
+}
+
+.variant-rich .usability-callout--warn {
+  background: rgb(251 191 36 / 0.12);
+  border-color: rgb(251 191 36 / 0.35);
+  color: #fff7ed;
+}

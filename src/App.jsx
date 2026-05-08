@@ -1,6 +1,9 @@
 import { Routes, Route } from "react-router-dom";
 import { Layout } from "./components/Layout.jsx";
 import { VariantSegmentToggle } from "./components/VariantSegmentToggle.jsx";
+import { UsabilityTestComplete } from "./pages/UsabilityTestComplete.jsx";
+import { UsabilityTestPhaseBridge } from "./pages/UsabilityTestPhaseBridge.jsx";
+import { UsabilityTestStart } from "./pages/UsabilityTestStart.jsx";
 import { RichLayout } from "./variants/rich/RichLayout.jsx";
 import { Home } from "./pages/Home.jsx";
 import { Shop } from "./pages/Shop.jsx";
@@ -43,13 +46,16 @@ export default function App() {
         <VariantSegmentToggle placement="corner" />
       </div>
       <Routes>
-      <Route path="/rich/*" element={<RichLayout />}>
-        {storeRouteList()}
-      </Route>
-      <Route path="/" element={<Layout />}>
-        {storeRouteList()}
-      </Route>
-    </Routes>
+        <Route path="/test" element={<UsabilityTestStart />} />
+        <Route path="/test/continue" element={<UsabilityTestPhaseBridge />} />
+        <Route path="/test/complete" element={<UsabilityTestComplete />} />
+        <Route path="/rich/*" element={<RichLayout />}>
+          {storeRouteList()}
+        </Route>
+        <Route path="/" element={<Layout />}>
+          {storeRouteList()}
+        </Route>
+      </Routes>
     </>
   );
 }

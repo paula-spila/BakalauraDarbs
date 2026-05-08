@@ -8,6 +8,7 @@ import "./index.css";
 import "./variants/rich/theme.css";
 import "./variants/rich/rich-extras.css";
 import "./variants/rich/rich-chrome.css";
+import "./styles/usability-test.css";
 
 const rawBase = import.meta.env.BASE ?? "/";
 const basename =
