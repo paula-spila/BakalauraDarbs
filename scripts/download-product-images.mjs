@@ -1,8 +1,4 @@
-/**
- * Downloads product photos into public/images/products/{id}.jpg for local hosting.
- * Photos are from Pexels (https://www.pexels.com/license/) — free to use; attribution
- * appreciated. Run: node scripts/download-product-images.mjs
- */
+
 import fs from "node:fs";
 import https from "node:https";
 import path from "node:path";
@@ -12,10 +8,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const outDir = path.join(__dirname, "../public/images/products");
 const query = "auto=compress&cs=tinysrgb&w=900&h=900&fit=crop";
 
-/**
- * One unique Pexels photo ID per catalog product (LV names → English stock search).
- * URLs verified via HTTP HEAD; re-run after changing IDs: npm run fetch-images
- */
 const pexelsByProductId = {
   1: "6542390", // ceramic / pottery tableware (clay mug)
   2: "1000084", // water bottle

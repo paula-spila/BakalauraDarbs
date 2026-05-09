@@ -1,8 +1,3 @@
-/**
- * Generates src/variants/rich/theme.css from non-minimalist-version/src/index.css
- * by prefixing selectors with .variant-rich (keeps html / * / keyframes).
- * Run: node scripts/build-variant-rich-css.mjs
- */
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -39,7 +34,6 @@ function prefixSelector(sel) {
 ast.walkAtRules((at) => {
   if (at.name === "keyframes") {
     at.walkRules((rule) => {
-      /* keep keyframe selectors */
     });
   }
 });
@@ -55,7 +49,6 @@ ast.walkRules((rule) => {
 
 let css = ast.toString();
 
-// #root rule may now target .variant-rich .app-wrap with duplicate flex — normalize
 css = css.replace(
   /\.variant-rich \.app-wrap\s*\{[^}]*min-height:\s*100vh[^}]*\}/gs,
   `.variant-rich .app-wrap {

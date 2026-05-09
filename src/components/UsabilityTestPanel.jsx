@@ -7,6 +7,7 @@ export function UsabilityTestPanel() {
     session,
     measuring,
     clickCount,
+    isCompletingTask,
     beginCurrentTask,
     completeCurrentTask,
     skipCurrentTask,
@@ -23,8 +24,8 @@ export function UsabilityTestPanel() {
   if (!session || !task) return null;
 
   const variantHuman = variantLabel === "B" ? "B (blīvs)" : "A (minimālais)";
-  const canStart = !measuring;
-  const canFinish = measuring;
+  const canStart = !measuring && !isCompletingTask;
+  const canFinish = measuring && !isCompletingTask;
 
   return (
     <aside

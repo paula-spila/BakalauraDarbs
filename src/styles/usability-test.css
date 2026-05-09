@@ -1,5 +1,3 @@
-/* Neitrāls testa UI — vienāds A un B variantā; neietekmē veikala tēmas tokenus */
-
 body.usability-test-active .variant-ab-host {
   display: none;
 }

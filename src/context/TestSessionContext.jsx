@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   isGoogleFormConfigured,
@@ -19,8 +20,14 @@ import {
   FORM_PHASE1_VARIANT_ENTRY,
   FORM_PHASE2_VARIANT_ENTRY,
 } from "../config/usabilityTestEnv.js";
-import { getTaskSetNumberForPhase, getTasksForPhase } from "../data/usabilityTestTasks.js";
-import { postUsabilityPayload } from "../lib/postUsabilityPayload.js";
+import { getTasksForPhase } from "../data/usabilityTestTasks.js";
+import {
+  buildPhaseApiPayload,
+  buildSessionApiPayload,
+  mergePhaseResults,
+  mergeTaskRunsWithDedupe,
+  taskResultId,
+} from "../lib/batchTestResults.js";
 import {
   downloadSessionCsvOnly,
   downloadSessionJsonOnly,
@@ -85,8 +92,10 @@ export function TestSessionProvider({ children }) {
   const [clickCount, setClickCount] = useState(
     () => readRawSession()?.activeMeasurement?.clickCount ?? 0,
   );
+  const [isCompletingTask, setIsCompletingTask] = useState(false);
   const sessionRef = useRef(session);
   const measureClicksRef = useRef(0);
+  const finishingTaskRef = useRef(false);
   sessionRef.current = session;
 
   const commitSession = useCallback((next) => {
@@ -235,7 +244,8 @@ export function TestSessionProvider({ children }) {
   }, [persist]);
 
   const finishCurrentTask = useCallback(
-    async ({ completed, skipped }) => {
+    ({ completed, skipped }) => {
+      if (finishingTaskRef.current) return;
       const s = sessionRef.current;
       if (!s?.activeMeasurement) return;
       const phase = s.currentPhase;
@@ -243,121 +253,108 @@ export function TestSessionProvider({ children }) {
       const idx = s.currentTaskIndex ?? 0;
       const task = tasks[idx];
       if (!task) return;
-      const taskSet = getTaskSetNumberForPhase(phase);
-      const variant = phase === 1 ? s.phase1Variant : s.phase2Variant;
-      const started = s.activeMeasurement.taskStartedAt;
-      const completedAt = new Date().toISOString();
-      const durationMs = new Date(completedAt) - new Date(started);
-      const durationSeconds = Math.round((durationMs / 1000) * 100) / 100;
-      const clicks = measureClicksRef.current;
-      const logSlice = (s.activeMeasurement.actionLog ?? []).slice(0, 40);
-      const row = {
-        participantId: s.participantId,
-        testOrder: s.testOrder,
-        phase,
-        variant,
-        taskSet,
-        taskId: task.id,
-        taskTitle: task.title,
-        taskInstruction: task.instruction,
-        taskStartedAt: started,
-        taskCompletedAt: completedAt,
-        durationSeconds,
-        completed: Boolean(completed),
-        skipped: Boolean(skipped),
-        clickCount: clicks,
-        finalUrl: window.location.href,
-        timestamp: completedAt,
-        expectedArea: task.expectedArea ?? "",
-        actionLog: logSlice,
-      };
 
-      setMeasuring(false);
-      measureClicksRef.current = 0;
-
-      await postUsabilityPayload({ type: "task", ...row });
-
-      const taskRuns = [...(s.taskRuns ?? []), row];
-      const nextIdx = idx + 1;
-      const isLastTaskInPhase = idx === 7;
-
-      if (!isLastTaskInPhase) {
-        const next = {
-          ...s,
-          taskRuns,
-          currentTaskIndex: nextIdx,
-          activeMeasurement: null,
+      finishingTaskRef.current = true;
+      flushSync(() => setIsCompletingTask(true));
+      try {
+        const taskSet = phase === 1 ? 1 : 2;
+        const variant = phase === 1 ? s.phase1Variant : s.phase2Variant;
+        const started = s.activeMeasurement.taskStartedAt;
+        const completedAt = new Date().toISOString();
+        const durationMs = new Date(completedAt) - new Date(started);
+        const durationSeconds = Math.round((durationMs / 1000) * 100) / 100;
+        const clicks = measureClicksRef.current;
+        const logSlice = (s.activeMeasurement.actionLog ?? []).slice(0, 40);
+        const resultId = taskResultId(s.participantId, phase, variant, taskSet, task.id);
+        const row = {
+          participantId: s.participantId,
+          testOrder: s.testOrder,
+          phase,
+          variant,
+          taskSet,
+          taskId: task.id,
+          taskTitle: task.title,
+          taskInstruction: task.instruction,
+          taskStartedAt: started,
+          taskCompletedAt: completedAt,
+          durationSeconds,
+          completed: Boolean(completed),
+          skipped: Boolean(skipped),
+          clickCount: clicks,
+          finalUrl: window.location.href,
+          timestamp: completedAt,
+          expectedArea: task.expectedArea ?? "",
+          actionLog: logSlice,
         };
-        commitSession(next);
-        setClickCount(0);
-        return;
-      }
 
-      if (phase === 1) {
-        const p1Done = completedAt;
-        const next = {
+        setMeasuring(false);
+        measureClicksRef.current = 0;
+
+        const taskRuns = mergeTaskRunsWithDedupe(s.taskRuns, row, resultId);
+        const nextIdx = idx + 1;
+        const isLastTaskInPhase = idx === 7;
+
+        if (!isLastTaskInPhase) {
+          const next = {
+            ...s,
+            taskRuns,
+            currentTaskIndex: nextIdx,
+            activeMeasurement: null,
+          };
+          commitSession(next);
+          setClickCount(0);
+          return;
+        }
+
+        if (phase === 1) {
+          const p1Done = completedAt;
+          const phase1Payload = buildPhaseApiPayload(s, 1, p1Done, taskRuns);
+          const next = {
+            ...s,
+            taskRuns,
+            currentTaskIndex: 8,
+            activeMeasurement: null,
+            phase1CompletedAt: p1Done,
+            phaseResults: mergePhaseResults(s.phaseResults, phase1Payload),
+          };
+          commitSession(next);
+          setClickCount(0);
+          navigate("/test/continue");
+          return;
+        }
+
+        const p2Done = completedAt;
+        const startedAtMs = new Date(s.sessionStartedAt).getTime();
+        const totalDurationSeconds =
+          Math.round(((Date.now() - startedAtMs) / 1000) * 100) / 100;
+        const phase2Payload = buildPhaseApiPayload(s, 2, p2Done, taskRuns);
+        const nextBase = {
           ...s,
           taskRuns,
           currentTaskIndex: 8,
           activeMeasurement: null,
-          phase1CompletedAt: p1Done,
+          phase2CompletedAt: p2Done,
+          sessionCompletedAt: p2Done,
+          sessionMeta: {
+            ...(s.sessionMeta ?? {}),
+            totalDurationSeconds,
+            viewportWidth: window.innerWidth,
+            viewportHeight: window.innerHeight,
+          },
+          phaseResults: mergePhaseResults(s.phaseResults, phase2Payload),
+        };
+        const sessionSummary = buildSessionApiPayload(nextBase);
+        const next = {
+          ...nextBase,
+          sessionSummary,
         };
         commitSession(next);
         setClickCount(0);
-        const phaseTasks = taskRuns.filter((r) => r.phase === 1);
-        await postUsabilityPayload({
-          type: "phase_summary",
-          participantId: s.participantId,
-          testOrder: s.testOrder,
-          phase: 1,
-          phaseVariant: s.phase1Variant,
-          taskSet: 1,
-          phase1CompletedAt: p1Done,
-          tasks: phaseTasks,
-        });
-        navigate("/test/continue");
-        return;
+        navigate("/test/complete");
+      } finally {
+        finishingTaskRef.current = false;
+        setIsCompletingTask(false);
       }
-
-      const p2Done = completedAt;
-      const startedAtMs = new Date(s.sessionStartedAt).getTime();
-      const totalDurationSeconds =
-        Math.round(((Date.now() - startedAtMs) / 1000) * 100) / 100;
-      const next = {
-        ...s,
-        taskRuns,
-        currentTaskIndex: 8,
-        activeMeasurement: null,
-        phase2CompletedAt: p2Done,
-        sessionCompletedAt: p2Done,
-        sessionMeta: {
-          ...(s.sessionMeta ?? {}),
-          totalDurationSeconds,
-          viewportWidth: window.innerWidth,
-          viewportHeight: window.innerHeight,
-        },
-      };
-      commitSession(next);
-      setClickCount(0);
-      await postUsabilityPayload({
-        type: "session_summary",
-        participantId: next.participantId,
-        testOrder: next.testOrder,
-        sessionStartedAt: next.sessionStartedAt,
-        phase1Variant: next.phase1Variant,
-        phase2Variant: next.phase2Variant,
-        phase1StartedAt: next.phase1StartedAt,
-        phase1CompletedAt: next.phase1CompletedAt,
-        phase2StartedAt: next.phase2StartedAt,
-        phase2CompletedAt: p2Done,
-        sessionCompletedAt: p2Done,
-        totalDurationSeconds,
-        userAgent: navigator.userAgent,
-        viewportWidth: window.innerWidth,
-        viewportHeight: window.innerHeight,
-        taskRuns: next.taskRuns ?? [],
-      });
-      navigate("/test/complete");
     },
     [commitSession, navigate],
   );
@@ -390,6 +387,9 @@ export function TestSessionProvider({ children }) {
         phase1Variant,
         phase2Variant,
         taskRuns: [],
+        phaseResults: [],
+        sessionSummary: null,
+        batchUploadFinishedAt: null,
         activeMeasurement: null,
         sessionMeta: {
           userAgent: navigator.userAgent,
@@ -427,9 +427,9 @@ export function TestSessionProvider({ children }) {
     return { path: homePathForVariant(s.phase2Variant) };
   }, [clearCart, commitSession]);
 
-  const buildGoogleFormUrl = useCallback(() => {
+  const buildGoogleFormUrl = useCallback((sessionOverride) => {
     if (!isGoogleFormConfigured()) return null;
-    const s = readRawSession();
+    const s = sessionOverride ?? readRawSession();
     if (!s?.participantId) return null;
     try {
       const u = new URL(GOOGLE_FORM_BASE_URL);
@@ -462,6 +462,7 @@ export function TestSessionProvider({ children }) {
       session,
       measuring,
       clickCount,
+      isCompletingTask,
       showPanel,
       isTestResultsEndpointConfigured: isTestResultsEndpointConfigured(),
       isGoogleFormConfigured: isGoogleFormConfigured(),
@@ -481,6 +482,7 @@ export function TestSessionProvider({ children }) {
       session,
       measuring,
       clickCount,
+      isCompletingTask,
       showPanel,
       refreshFromStorage,
       resetEntireTest,

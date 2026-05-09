@@ -1,8 +1,3 @@
-/**
- * Vite env: prefix with VITE_ and define in .env (see .env.example).
- * Google Forms entry keys are typically like "entry.1234567890".
- */
-
 export const TEST_RESULTS_ENDPOINT =
   import.meta.env.VITE_TEST_RESULTS_ENDPOINT?.trim() ?? "";
 

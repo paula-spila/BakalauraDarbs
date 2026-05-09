@@ -18,10 +18,6 @@ import { Iepirkties } from "./pages/Iepirkties.jsx";
 import { Noteikumi } from "./pages/Noteikumi.jsx";
 import { Privatums } from "./pages/Privatums.jsx";
 
-/**
- * Must be an array of `<Route>` nodes (not a wrapper component).
- * React Router only understands Route / Fragment as route config children.
- */
 function storeRouteList() {
   return [
     <Route key="index" index element={<Home />} />,

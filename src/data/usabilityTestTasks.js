@@ -1,8 +1,3 @@
-/**
- * Uzdevumu komplekti lietojamības testam (A/B versijas).
- * phase 1 → TaskSet 1, phase 2 → TaskSet 2 (neatkarīgi no A/B secības).
- */
-
 export const TASK_SET_1 = [
   {
     id: "s1-t1",
@@ -127,7 +122,6 @@ export const TASK_SET_2 = [
   },
 ];
 
-/** Fāze 1 → komplekts 1, fāze 2 → komplekts 2 */
 export function getTaskSetNumberForPhase(phase) {
   return phase === 1 ? 1 : 2;
 }
