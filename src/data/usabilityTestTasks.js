@@ -59,7 +59,7 @@ export const TASK_SET_1 = [
     id: "s1-t1",
     title: "Produkta lapa",
     instruction:
-      "Atrodiet produktu “Uzglabāšanas kaste (S)” un atveriet tās preces lapu.",
+      "Atrodiet produktu “Uzglabāšanas kaste” un atveriet tās preces lapu.",
     successType: "productPage",
     targetProductId: 9,
   },
@@ -111,7 +111,7 @@ export const TASK_SET_1 = [
     id: "s1-t6",
     title: "Grozs",
     instruction:
-      "Pievienojiet produktu “Bišu vaska svece” grozam un atveriet grozu.",
+      "Pievienojiet produktu “Vaska svece” grozam.",
     successType: "cartContainsAndOpened",
     targetProductId: 8,
     minQuantity: 1,
@@ -194,7 +194,7 @@ export const TASK_SET_2 = [
     id: "s2-t5",
     title: "Materiāls",
     instruction:
-      "Atveriet produkta “Marķieri (4 krāsas)” detalizēto lapu un ievadiet, no kāda materiāla tie ir izgatavoti.",
+      "Atveriet produkta “Marķieri” detalizēto lapu un ievadiet, no kāda materiāla tie ir izgatavoti.",
     successType: "answerInput",
     targetProductId: 36,
     acceptedAnswers: [
@@ -211,7 +211,7 @@ export const TASK_SET_2 = [
     id: "s2-t6",
     title: "Grozs",
     instruction:
-      "Pievienojiet produktu “Bambusa griešanas dēlis” grozam un atveriet grozu.",
+      "Pievienojiet produktu “Griešanas dēlis” grozam.",
     successType: "cartContainsAndOpened",
     targetProductId: 3,
     minQuantity: 1,

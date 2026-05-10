@@ -1,9 +1,21 @@
 {
   "categories": [
-    { "id": "virtuve-un-galds", "label": "Virtuve un galds" },
-    { "id": "vanna-un-kopsana", "label": "Vanna un kopšana" },
-    { "id": "maja-un-uzglabasana", "label": "Māja un uzglabāšana" },
-    { "id": "kanceleja-un-somas", "label": "Kanceleja un somas" }
+    {
+      "id": "virtuve-un-galds",
+      "label": "Virtuve un galds"
+    },
+    {
+      "id": "vanna-un-kopsana",
+      "label": "Vanna un kopšana"
+    },
+    {
+      "id": "maja-un-uzglabasana",
+      "label": "Māja un uzglabāšana"
+    },
+    {
+      "id": "kanceleja-un-somas",
+      "label": "Kanceleja un somas"
+    }
   ],
   "products": [
     {
@@ -20,8 +32,8 @@
     },
     {
       "id": 2,
-      "name": "Stikla ūdens pudele",
-      "description": "Borosilikāta stikls ar silikona apvalku.",
+      "name": "Ūdens pudele",
+      "description": "stikls ar silikona apvalku.",
       "price": 18,
       "categoryId": "virtuve-un-galds",
       "material": "Stikls, silikons",
@@ -32,11 +44,11 @@
     },
     {
       "id": 3,
-      "name": "Bambusa griešanas dēlis",
+      "name": "Griešanas dēlis",
       "description": "Kompakts dēlis ikdienas sagatavošanai.",
       "price": 22,
       "categoryId": "virtuve-un-galds",
-      "material": "Bambuss",
+      "material": "Koks",
       "size": "28 × 20 cm",
       "color": "Dabīga",
       "delivery": "2–3 darba dienas",
@@ -44,7 +56,7 @@
     },
     {
       "id": 4,
-      "name": "Dakšu komplekts (4 gab.), nerūsējošais tērauds",
+      "name": "Dakšu komplekts",
       "description": "Vienkārša galda piederumu komplekts.",
       "price": 16,
       "categoryId": "virtuve-un-galds",
@@ -68,7 +80,7 @@
     },
     {
       "id": 6,
-      "name": "Virtuves dvielis (2 gab.), kokvilna",
+      "name": "Virtuves dvielis",
       "description": "Absorbējošs, cilpveida audums.",
       "price": 11,
       "categoryId": "virtuve-un-galds",
@@ -80,7 +92,7 @@
     },
     {
       "id": 7,
-      "name": "Lina salvetes (4 gab.)",
+      "name": "Lina salvetes",
       "description": "Mīkstas lina salvetes.",
       "price": 19,
       "categoryId": "virtuve-un-galds",
@@ -92,7 +104,7 @@
     },
     {
       "id": 8,
-      "name": "Bišu vaska svece",
+      "name": "Vaska svece",
       "description": "Maiga medus nots, kokvilnas dakts.",
       "price": 9,
       "categoryId": "maja-un-uzglabasana",
@@ -104,7 +116,7 @@
     },
     {
       "id": 9,
-      "name": "Uzglabāšanas kaste (S)",
+      "name": "Uzglabāšanas kaste",
       "description": "Uzliekama kaste ar vāku sīkumiem.",
       "price": 13,
       "categoryId": "maja-un-uzglabasana",
@@ -116,7 +128,7 @@
     },
     {
       "id": 10,
-      "name": "Pīts uzglabāšanas grozs",
+      "name": "Uzglabāšanas grozs",
       "description": "Atvērts grozs plauktiem un galdam.",
       "price": 24,
       "categoryId": "maja-un-uzglabasana",
@@ -128,8 +140,8 @@
     },
     {
       "id": 11,
-      "name": "Galda organizatora paliktnis",
-      "description": "Viens nodalījums atslēgām un piezīmēm.",
+      "name": "Galda paliktnis",
+      "description": "Aizsargā virsmas, vienkāršs dizains ikdienas lietošanai.",
       "price": 8,
       "categoryId": "maja-un-uzglabasana",
       "material": "Bambuss",
@@ -140,8 +152,8 @@
     },
     {
       "id": 12,
-      "name": "Vannas dvielis, kokvilna",
-      "description": "Blīvs ikdienas dvielis.",
+      "name": "Vannasistabas dvielis",
+      "description": "Ikdienas dvielis.",
       "price": 21,
       "categoryId": "vanna-un-kopsana",
       "material": "Kokvilna",
@@ -152,7 +164,7 @@
     },
     {
       "id": 13,
-      "name": "Šķidrās ziepes (uzpilde)",
+      "name": "Šķidrās ziepes",
       "description": "Bez smaržas, 500 ml.",
       "price": 7,
       "categoryId": "vanna-un-kopsana",
@@ -164,7 +176,7 @@
     },
     {
       "id": 14,
-      "name": "Ziepes batoniņš (lavanda)",
+      "name": "Ziepes",
       "description": "Augu eļļu ziepes.",
       "price": 4.5,
       "categoryId": "vanna-un-kopsana",
@@ -176,7 +188,7 @@
     },
     {
       "id": 15,
-      "name": "Bambusa zobu birste (1 gab.)",
+      "name": "Zobu birste",
       "description": "Mīksti sari, vienkārša roktura forma.",
       "price": 3.5,
       "categoryId": "vanna-un-kopsana",
@@ -188,8 +200,8 @@
     },
     {
       "id": 16,
-      "name": "Piezīmju grāmata A5",
-      "description": "Līniju lappuses, ērta atvēršanās.",
+      "name": "Piezīmju grāmata",
+      "description": "Līniju lappuses.",
       "price": 10,
       "categoryId": "kanceleja-un-somas",
       "material": "Papīrs, kartona vāks",
@@ -200,7 +212,7 @@
     },
     {
       "id": 17,
-      "name": "Lodīšu pildspalva (2 gab.)",
+      "name": "Lodīšu pildspalva",
       "description": "Melna tinte, gluda rakstīšana.",
       "price": 5,
       "categoryId": "kanceleja-un-somas",
@@ -213,7 +225,7 @@
     {
       "id": 18,
       "name": "Auduma soma",
-      "description": "Ikdienas soma, pastiprinātas rokturi.",
+      "description": "Ikdienas soma, pastiprināti rokturi.",
       "price": 15,
       "categoryId": "kanceleja-un-somas",
       "material": "Kokvilnas audekls",
@@ -224,8 +236,8 @@
     },
     {
       "id": 19,
-      "name": "Paliktņi no korķa (4 gab.)",
-      "description": "Aizsargā virsmas, atturēts dizains.",
+      "name": "Paliktņi no korķa",
+      "description": "Aizsargā virsmas.",
       "price": 8.5,
       "categoryId": "virtuve-un-galds",
       "material": "Korķis",
@@ -260,7 +272,7 @@
     },
     {
       "id": 22,
-      "name": "Ķiploku prese, nerūsējošais tērauds",
+      "name": "Ķiploku prese",
       "description": "Ērti smalcina ķiplokus, viegli tīrāms.",
       "price": 9.5,
       "categoryId": "virtuve-un-galds",
@@ -272,7 +284,7 @@
     },
     {
       "id": 23,
-      "name": "Silikona virtuves lāpstiņa",
+      "name": "Virtuves lāpstiņa",
       "description": "Karstumizturīgs silikons, mīksts malas profils.",
       "price": 6.5,
       "categoryId": "virtuve-un-galds",
@@ -284,7 +296,7 @@
     },
     {
       "id": 24,
-      "name": "Porcelāna brokastu šķīvis",
+      "name": "Brokastu šķīvis",
       "description": "Rāmis ar matētu mali, ikdienas lietošanai.",
       "price": 7.5,
       "categoryId": "virtuve-un-galds",
@@ -296,7 +308,7 @@
     },
     {
       "id": 25,
-      "name": "Kokvilnas virtuves cimds (1 gab.)",
+      "name": "Virtuves cimds",
       "description": "Siltumizolācija līdz 200 °C, garš rokturis.",
       "price": 5.5,
       "categoryId": "virtuve-un-galds",
@@ -308,7 +320,7 @@
     },
     {
       "id": 26,
-      "name": "Dušas želeja, neitrāla",
+      "name": "Dušas želeja",
       "description": "Maiga ādai, 400 ml, bez SLS (pēc sastāva).",
       "price": 8,
       "categoryId": "vanna-un-kopsana",
@@ -320,7 +332,7 @@
     },
     {
       "id": 27,
-      "name": "Kokvilnas vates kociņi (200 gab.)",
+      "name": "Vates kociņi",
       "description": "Higiēniskā ietveršana, papīra stienīši.",
       "price": 3.8,
       "categoryId": "vanna-un-kopsana",
@@ -332,7 +344,7 @@
     },
     {
       "id": 28,
-      "name": "Roku krēms, shea sviests",
+      "name": "Roku krēms",
       "description": "Ātria uzsūkšanās, 75 ml, ziemas kopšanai.",
       "price": 8.5,
       "categoryId": "vanna-un-kopsana",
@@ -344,8 +356,8 @@
     },
     {
       "id": 29,
-      "name": "Zobu diegs, vaksēts (50 m)",
-      "description": "Plakans profils, piparmētras nots (gaisa svaigs).",
+      "name": "Zobu diegs",
+      "description": "Piparmētras nots.",
       "price": 2.9,
       "categoryId": "vanna-un-kopsana",
       "material": "Neilons, pārklājums",
@@ -356,7 +368,7 @@
     },
     {
       "id": 30,
-      "name": "Mīkstais vannas paklājiņš",
+      "name": "Vannas paklājiņš",
       "description": "Pret slīdēšanu, ātri žūst, 40 × 60 cm.",
       "price": 12,
       "categoryId": "vanna-un-kopsana",
@@ -368,7 +380,7 @@
     },
     {
       "id": 31,
-      "name": "Keramikas puķu pods (M)",
+      "name": "Puķu pods",
       "description": "Drenāžas caurule apakšā, ziemas dārzam iekšā.",
       "price": 14.5,
       "categoryId": "maja-un-uzglabasana",
@@ -380,7 +392,7 @@
     },
     {
       "id": 32,
-      "name": "Grāmatu balsts koka (pāris)",
+      "name": "Grāmatu plaukts",
       "description": "Vienkāršs, stabilas galda plauktam.",
       "price": 11,
       "categoryId": "maja-un-uzglabasana",
@@ -392,7 +404,7 @@
     },
     {
       "id": 33,
-      "name": "Sienas pulkstenis, kluss mehānisms",
+      "name": "Sienas pulkstenis",
       "description": "Ø 30 cm, cipari bez trokšņa, mājas birojam.",
       "price": 27,
       "categoryId": "maja-un-uzglabasana",
@@ -404,7 +416,7 @@
     },
     {
       "id": 34,
-      "name": "Drēbju pakaramais, 5 āķi",
+      "name": "Drēbju pakaramie",
       "description": "Koka plāksne, metāla āķi, viegla montāža.",
       "price": 18.5,
       "categoryId": "maja-un-uzglabasana",
@@ -416,7 +428,7 @@
     },
     {
       "id": 35,
-      "name": "Spīdīga stikla vāze, smalka",
+      "name": "Vāze",
       "description": "Cilindra forma, 25 cm, ziediem un zariem.",
       "price": 19,
       "categoryId": "maja-un-uzglabasana",
@@ -428,7 +440,7 @@
     },
     {
       "id": 36,
-      "name": "Marķieri (4 krāsas)",
+      "name": "Marķieri",
       "description": "Biezs uzgalis, piemēroti aizzīmēšanai plānotājam.",
       "price": 4.2,
       "categoryId": "kanceleja-un-somas",
@@ -440,7 +452,7 @@
     },
     {
       "id": 37,
-      "name": "Mappe dokumentiem, A4",
+      "name": "Dokumentu mape",
       "description": "Ciets vāks, gumijas aizdare, līdz 300 lapām.",
       "price": 6.8,
       "categoryId": "kanceleja-un-somas",
@@ -452,7 +464,7 @@
     },
     {
       "id": 38,
-      "name": "Ielīmju lapa, plānotājam (50 uzlīmes)",
+      "name": "Līmlapas",
       "description": "Neitrāli marķieri un ikonas, bez atlikuma.",
       "price": 3.2,
       "categoryId": "kanceleja-un-somas",
@@ -464,7 +476,7 @@
     },
     {
       "id": 39,
-      "name": "Mazā kosmētikas somiņa",
+      "name": "Kosmētikas soma",
       "description": "Ūdensnecaurlaidīgs segums, rāvējslēdzējs, 24 × 16 cm.",
       "price": 9.5,
       "categoryId": "kanceleja-un-somas",
@@ -476,7 +488,7 @@
     },
     {
       "id": 40,
-      "name": "Peles paliktnis, auduma",
+      "name": "Peles paliktnis",
       "description": "Liela laukuma, neslīdēšanas pamatne, datoram mājās.",
       "price": 7,
       "categoryId": "kanceleja-un-somas",
@@ -488,7 +500,7 @@
     },
     {
       "id": 41,
-      "name": "Tējkanna nerūsējošā tērauda, 1,2 l",
+      "name": "Tējkanna",
       "description": "Plakana pamatne indukcijai, silikona rokturis, tējas sietiņš komplektā.",
       "price": 32,
       "categoryId": "virtuve-un-galds",
@@ -500,7 +512,7 @@
     },
     {
       "id": 42,
-      "name": "Ēdamkarotes koka (6 gab.)",
+      "name": "Ēdamkarotes",
       "description": "Eļļotas, gludas malas — salātiem un ikdienas maltītēm.",
       "price": 10.5,
       "categoryId": "virtuve-un-galds",
@@ -512,8 +524,8 @@
     },
     {
       "id": 43,
-      "name": "Garšvielu dzirnaviņas, keramika",
-      "description": "Keramikas dzirnaviņas ar regulējamu rupjumu, bez baterijām.",
+      "name": "Pupiņu dzirnaviņas",
+      "description": "Dzirnaviņas ar regulējamu rupjumu, bez baterijām.",
       "price": 24,
       "categoryId": "virtuve-un-galds",
       "material": "Keramika, nerūsējošais tērauds",
@@ -524,7 +536,7 @@
     },
     {
       "id": 44,
-      "name": "Silikona veidne ledus gabaliņiem",
+      "name": "Silikona veidne ledum",
       "description": "24 nodalījumi, viegli izkratāms, saldētavai un kokteiļiem.",
       "price": 6,
       "categoryId": "virtuve-un-galds",
@@ -536,7 +548,7 @@
     },
     {
       "id": 45,
-      "name": "Termokrūze nerūsējošā tērauda, 400 ml",
+      "name": "Termokrūze",
       "description": "Divkāršās sienas, necaurlaidīgs vāks — līdz 6 h siltam dzērienam.",
       "price": 21,
       "categoryId": "virtuve-un-galds",
@@ -548,7 +560,7 @@
     },
     {
       "id": 46,
-      "name": "Vannas sāls, lavanda",
+      "name": "Vannas sāls",
       "description": "Relaksējošai peldei, 500 g, bez krāsvielām.",
       "price": 5.9,
       "categoryId": "vanna-un-kopsana",
@@ -560,7 +572,7 @@
     },
     {
       "id": 47,
-      "name": "Šampūns, neitrāls",
+      "name": "Šampūns",
       "description": "Maigs matiem un galvas ādai, 250 ml, bez silikoniem (pēc sastāva).",
       "price": 9.5,
       "categoryId": "vanna-un-kopsana",
@@ -572,7 +584,7 @@
     },
     {
       "id": 48,
-      "name": "Kosmētikas spogulis ar statīvu",
+      "name": "Spogulis ar statīvu",
       "description": "Palielinājums 1× un 3×, kompakts galda formāts.",
       "price": 16,
       "categoryId": "vanna-un-kopsana",
@@ -584,7 +596,7 @@
     },
     {
       "id": 49,
-      "name": "Ķermeņa birste ar rokturi",
+      "name": "Ķermeņa birste",
       "description": "Dabīgas šķiedras, garš rokturis, dušai un pirtij.",
       "price": 11,
       "categoryId": "vanna-un-kopsana",
@@ -596,7 +608,7 @@
     },
     {
       "id": 50,
-      "name": "Sejas dvielīši kokvilnas (6 gab.)",
+      "name": "Sejas dvielis",
       "description": "Mīksti, blīvs adījums, 30 × 30 cm — ikdienas lietošanai.",
       "price": 13.5,
       "categoryId": "vanna-un-kopsana",
@@ -608,7 +620,7 @@
     },
     {
       "id": 51,
-      "name": "LED tējas svece ar taimeri",
+      "name": "LED tējas svece",
       "description": "Silikona «liesma», 3 režīmi, USB uzlāde — droša pie bērniem.",
       "price": 14,
       "categoryId": "maja-un-uzglabasana",
@@ -620,7 +632,7 @@
     },
     {
       "id": 52,
-      "name": "Drēbju grozs salocāms",
+      "name": "Drēbju grozs",
       "description": "Kokvilnas audums, alumīnija rāmis, viegli salikt un novākt.",
       "price": 19.5,
       "categoryId": "maja-un-uzglabasana",
@@ -632,7 +644,7 @@
     },
     {
       "id": 53,
-      "name": "Universālie putekļu sūcēja maisiņi (5 gab.)",
+      "name": "Putekļu sūcēja maisiņi",
       "description": "Der vairākiem populāriem modeļiem; mikrofiltrs putekļiem.",
       "price": 8.9,
       "categoryId": "maja-un-uzglabasana",
@@ -644,7 +656,7 @@
     },
     {
       "id": 54,
-      "name": "Logu tīrītājs ar teleskopisko rokturi",
+      "name": "Logu tīrītājs",
       "description": "Mikrošķiedras uzgalis, garums līdz 120 cm — grūti sasniedzami stikli.",
       "price": 15,
       "categoryId": "maja-un-uzglabasana",
@@ -656,7 +668,7 @@
     },
     {
       "id": 55,
-      "name": "Mēbeļu kāju paliktņi, filca komplekts",
+      "name": "Mēbeļu kāju paliktņi",
       "description": "16 gab., līmes slānis — aizsargā grīdu no skrāpējumiem.",
       "price": 4.5,
       "categoryId": "maja-un-uzglabasana",
@@ -668,7 +680,7 @@
     },
     {
       "id": 56,
-      "name": "Lineāls metāla, 30 cm",
+      "name": "Lineāls",
       "description": "Precīzs, ar neslīdošu pamatni zīmēšanai un griešanai.",
       "price": 3.8,
       "categoryId": "kanceleja-un-somas",
@@ -680,7 +692,7 @@
     },
     {
       "id": 57,
-      "name": "Žāvētājs uz dokumentiem",
+      "name": "Dokumentu turētājs",
       "description": "Kompakts, 4 ruļļi, piemērots A4 lapām un rēķiniem.",
       "price": 12.5,
       "categoryId": "kanceleja-un-somas",
@@ -692,8 +704,8 @@
     },
     {
       "id": 58,
-      "name": "Somas plecu siksna, regulējama",
-      "description": "Neilona lenta ar metāla sprādzēm — mugursomām un sporta somām.",
+      "name": "Plecu soma",
+      "description": "Neilona lenta ar metāla sprādzēm.",
       "price": 8,
       "categoryId": "kanceleja-un-somas",
       "material": "Neilons, metāls",
@@ -716,13 +728,13 @@
     },
     {
       "id": 60,
-      "name": "Galda LED lampa, uzlādējama",
+      "name": "Galda lampa",
       "description": "3 spilgtuma līmeņi, USB-C uzlāde, mājas birojam.",
       "price": 26,
       "categoryId": "kanceleja-un-somas",
       "material": "Alumīnijs, plastmasa",
       "size": "augstums 35 cm",
-      "color": "Balta ar pelēku pamatni",
+      "color": "Oranža ar baltu pamatni",
       "delivery": "2–3 darba dienas",
       "image": "/images/products/60.jpg"
     }
