@@ -32,18 +32,19 @@ export function UsabilityTestPhaseBridge() {
 
   function handleContinue() {
     const { path } = applyPhaseTwoTransition();
-    navigate(path);
+    navigate(path, { replace: true });
+    requestAnimationFrame(() => {
+      window.location.reload();
+    });
   }
 
   return (
     <div className="usability-legal-page">
       <div className="usability-legal-page__inner">
         <h1 className="page-title">Pirmā daļa pabeigta</h1>
-        <p>
-          Pirmā daļa ir pabeigta. Tagad turpināsiet ar otru vietnes versiju.
-        </p>
+        <p>Tagad turpināsies testa otrā daļa — cita vietnes versija un līdzīgi uzdevumi.</p>
         <button type="button" className="btn" onClick={handleContinue}>
-          Turpināt uz otro daļu
+          Turpināt
         </button>
       </div>
     </div>

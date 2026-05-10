@@ -2,6 +2,368 @@ body.usability-test-active .variant-ab-host {
   display: none;
 }
 
+body.usability-test-bottom {
+  padding-bottom: max(9.5rem, env(safe-area-inset-bottom, 0px));
+}
+
+.usability-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: max(1rem, env(safe-area-inset-top, 0px)) max(1rem, env(safe-area-inset-right, 0px))
+    max(1rem, env(safe-area-inset-bottom, 0px)) max(1rem, env(safe-area-inset-left, 0px));
+}
+
+.usability-overlay--blocking {
+  background: rgb(15 23 42 / 0.55);
+  pointer-events: auto;
+}
+
+.usability-overlay--soft {
+  background: rgb(15 23 42 / 0.35);
+  pointer-events: auto;
+}
+
+.usability-modal {
+  width: min(560px, 100%);
+  max-height: min(90vh, 36rem);
+  overflow: auto;
+  padding: 1.25rem 1.35rem;
+  border-radius: 12px;
+  border: 1px solid #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 0.22);
+}
+
+.usability-modal--peek {
+  max-width: min(480px, 100%);
+  max-height: min(70vh, 22rem);
+}
+
+.usability-modal__eyebrow {
+  margin: 0 0 0.35rem;
+  font-size: 0.7rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.usability-modal__participant {
+  margin: 0 0 0.5rem;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: #64748b;
+  font-variant-numeric: tabular-nums;
+}
+
+.usability-modal__progress {
+  margin: 0 0 0.85rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475569;
+}
+
+.usability-modal__title--primary {
+  margin-top: 0;
+  font-size: 1.25rem;
+  line-height: 1.25;
+}
+
+.usability-modal__meta {
+  margin: 0 0 0.75rem;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  color: #334155;
+}
+
+.usability-modal__title {
+  margin: 0 0 0.5rem;
+  font-size: 1.15rem;
+  font-weight: 800;
+}
+
+.usability-modal__instruction {
+  margin: 0 0 0.75rem;
+  font-size: 0.95rem;
+  line-height: 1.55;
+  color: #1e293b;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.usability-instruction-em {
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.01em;
+}
+
+.usability-modal__hint {
+  margin: 0 0 1rem;
+  font-size: 0.82rem;
+  color: #475569;
+}
+
+.usability-testdata-block {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+}
+
+.usability-testdata-block__title {
+  margin: 0 0 0.5rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #334155;
+}
+
+.usability-testdata-block__list {
+  margin: 0;
+  padding-left: 1.15rem;
+  font-size: 0.82rem;
+  line-height: 1.5;
+  color: #0f172a;
+}
+
+.usability-testdata-block__k {
+  font-weight: 600;
+  color: #475569;
+}
+
+.usability-testdata-block__note {
+  margin: 0.55rem 0 0;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: #64748b;
+}
+
+.usability-modal__primary {
+  width: 100%;
+  justify-content: center;
+}
+
+.usability-bottom-bar {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 99997;
+  max-height: min(46vh, 260px);
+  border-top: 1px solid #94a3b8;
+  background: #e2e8f0;
+  color: #0f172a;
+  box-shadow: 0 -6px 24px rgb(15 23 42 / 0.12);
+  pointer-events: auto;
+}
+
+.usability-bottom-bar__inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+  padding: 0.65rem max(0.85rem, env(safe-area-inset-right, 0px)) max(0.55rem, env(safe-area-inset-bottom, 0px))
+    max(0.85rem, env(safe-area-inset-left, 0px));
+  max-height: min(42vh, 240px);
+  overflow-x: hidden;
+  overflow-y: auto;
+}
+
+.usability-bottom-bar__main {
+  min-width: 0;
+  flex: 1;
+}
+
+.usability-bottom-bar__progress {
+  margin: 0 0 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: #334155;
+}
+
+.usability-bottom-bar__title {
+  margin: 0 0 0.2rem;
+  font-size: inherit;
+  line-height: 1.25;
+}
+
+.usability-bottom-bar__title-text {
+  display: block;
+  font-size: 1.05rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #0f172a;
+}
+
+.usability-bottom-bar__hint {
+  margin: 0;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #1e293b;
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-wrap: pretty;
+  hyphens: auto;
+}
+
+.usability-bottom-bar__testdata {
+  margin-top: 0.3rem;
+}
+
+.usability-bottom-bar__testdata-lead {
+  margin: 0 0 0.2rem;
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: #1e293b;
+}
+
+.usability-bottom-bar__testdata-hint {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.35;
+  color: #64748b;
+}
+
+.usability-bottom-bar__answer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+  margin-top: 0.45rem;
+}
+
+.usability-bottom-bar__answer-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+  align-items: center;
+}
+
+.usability-bottom-bar__input {
+  flex: 1 1 160px;
+  min-width: 140px;
+  font: inherit;
+  font-size: 0.9rem;
+  padding: 0.45rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid #64748b;
+}
+
+.usability-bottom-bar__error {
+  margin: 0.35rem 0 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #b91c1c;
+}
+
+.usability-bottom-bar__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex-shrink: 0;
+}
+
+.usability-bottom-bar__actions .btn {
+  font-size: 0.85rem;
+}
+
+.variant-rich .usability-modal {
+  background: #1e293b;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+.variant-rich .usability-modal__meta,
+.variant-rich .usability-modal__hint,
+.variant-rich .usability-modal__instruction {
+  color: #cbd5e1;
+}
+
+.variant-rich .usability-instruction-em {
+  color: #f8fafc;
+}
+
+.variant-rich .usability-modal__participant {
+  color: #94a3b8;
+}
+
+.variant-rich .usability-modal__progress {
+  color: #cbd5e1;
+}
+
+.variant-rich .usability-modal__title {
+  color: #f8fafc;
+}
+
+.variant-rich .usability-modal__title--primary {
+  color: #f8fafc;
+}
+
+.variant-rich .usability-testdata-block {
+  background: #0f172a;
+  border-color: #475569;
+}
+
+.variant-rich .usability-testdata-block__title {
+  color: #e2e8f0;
+}
+
+.variant-rich .usability-testdata-block__list {
+  color: #f1f5f9;
+}
+
+.variant-rich .usability-testdata-block__k {
+  color: #94a3b8;
+}
+
+.variant-rich .usability-testdata-block__note {
+  color: #94a3b8;
+}
+
+.variant-rich .usability-bottom-bar {
+  background: #0f172a;
+  border-color: #475569;
+  color: #e2e8f0;
+}
+
+.variant-rich .usability-bottom-bar__progress {
+  color: #cbd5e1;
+}
+
+.variant-rich .usability-bottom-bar__hint {
+  color: #e2e8f0;
+}
+
+.variant-rich .usability-bottom-bar__testdata-lead {
+  color: #e2e8f0;
+}
+
+.variant-rich .usability-bottom-bar__testdata-hint {
+  color: #94a3b8;
+}
+
+.variant-rich .usability-bottom-bar__title {
+  color: #f8fafc;
+}
+
+.variant-rich .usability-bottom-bar__title-text {
+  color: #f8fafc;
+}
+
+.variant-rich .usability-bottom-bar__input {
+  background: #1e293b;
+  border-color: #64748b;
+  color: #f8fafc;
+}
 .usability-legal-page {
   flex: 1;
   display: flex;
@@ -24,6 +386,91 @@ body.usability-test-active .variant-ab-host {
   flex-wrap: wrap;
   gap: var(--space-2);
   align-items: center;
+}
+
+/* Testa ievadleģa (/test) — neitrāls, plaša kolonna, nav A/B veikala stila */
+.usability-legal-page.usability-test-start {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.usability-test-start.usability-legal-page .usability-legal-page__inner {
+  width: min(54rem, 100%);
+}
+
+.usability-test-start__h1 {
+  margin: 0 0 1rem;
+  font-size: clamp(1.5rem, 2.5vw, 1.875rem);
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: -0.02em;
+}
+
+.usability-test-start__resume {
+  margin-bottom: 1.25rem;
+}
+
+.usability-test-start__prose {
+  font-size: 1rem;
+  line-height: 1.65;
+  color: #334155;
+}
+
+.usability-test-start__prose p {
+  margin: 0 0 0.85rem;
+}
+
+.usability-test-start__h2 {
+  margin: 1.5rem 0 0.65rem;
+  font-size: 1.125rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.usability-test-start__list {
+  margin: 0.35rem 0 0.25rem;
+  padding-left: 1.35rem;
+}
+
+.usability-test-start__list li {
+  margin-bottom: 0.45rem;
+  padding-left: 0.15rem;
+}
+
+.usability-test-start__consent {
+  margin-top: 1.5rem;
+  padding: 1rem 1.1rem;
+  border-radius: 8px;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  line-height: 1.5;
+  font-weight: 500;
+  color: #1e293b;
+}
+
+.usability-test-start__actions {
+  margin-top: 1rem;
+}
+
+.usability-test-start__debug {
+  margin-top: 1.75rem;
+}
+
+.usability-test-start .btn:not(.btn--ghost) {
+  background: #0f172a;
+  color: #f8fafc;
+  border-color: #0f172a;
+}
+
+.usability-test-start .btn:not(.btn--ghost):not(:disabled):hover {
+  background: #1e293b;
+  border-color: #1e293b;
+}
+
+.usability-test-start .btn--ghost {
+  background: #fff;
+  color: #334155;
+  border-color: #94a3b8;
 }
 
 .usability-consent {
@@ -237,4 +684,197 @@ body.usability-test-active .variant-ab-host {
   background: rgb(251 191 36 / 0.12);
   border-color: rgb(251 191 36 / 0.35);
   color: #fff7ed;
+}
+
+/* /test paliek neitrāls pat ja kādreiz ielādēts zem /rich konteksta */
+.variant-rich .usability-legal-page.usability-test-start {
+  background: #f1f5f9;
+  color: #1e293b;
+}
+
+.variant-rich .usability-test-start__h1,
+.variant-rich .usability-test-start__h2 {
+  color: #0f172a;
+}
+
+.variant-rich .usability-test-start__prose,
+.variant-rich .usability-test-start__prose p,
+.variant-rich .usability-test-start__list li {
+  color: #334155;
+}
+
+.variant-rich .usability-test-start .usability-consent {
+  color: #1e293b;
+}
+
+.variant-rich .usability-test-start .usability-hint,
+.variant-rich .usability-test-start .usability-hint a {
+  color: #64748b;
+}
+
+.variant-rich .usability-test-start .usability-callout--info {
+  background: var(--surface);
+  border-color: var(--border);
+  color: #334155;
+}
+
+/* ---- Planšetes un mobilās ierīces (testa UI + /test, /test/continue, /test/complete) ---- */
+.usability-overlay,
+.usability-modal,
+.usability-bottom-bar {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.usability-modal {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+
+.usability-modal .btn.usability-modal__primary,
+.usability-modal__primary.btn {
+  min-height: 44px;
+  touch-action: manipulation;
+}
+
+@media (max-width: 1024px) {
+  .usability-test-start.usability-legal-page .usability-legal-page__inner {
+    width: min(48rem, 100%);
+  }
+
+  .usability-modal {
+    width: min(520px, calc(100vw - 1.5rem));
+    max-height: min(88dvh, 36rem);
+  }
+}
+
+@media (max-width: 640px) {
+  .usability-overlay {
+    align-items: flex-start;
+    justify-content: center;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-y: contain;
+    padding: max(0.75rem, env(safe-area-inset-top)) max(0.75rem, env(safe-area-inset-right))
+      max(0.75rem, env(safe-area-inset-bottom)) max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .usability-modal {
+    width: calc(100vw - 1.5rem);
+    max-width: 100%;
+    margin: 0 auto;
+    max-height: none;
+    border-radius: 10px;
+  }
+
+  .usability-modal--peek {
+    max-height: min(78dvh, 28rem);
+  }
+
+  .usability-modal__title {
+    font-size: 1.05rem;
+  }
+
+  .usability-modal__instruction {
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+    hyphens: auto;
+  }
+
+  .usability-bottom-bar {
+    max-height: min(42dvh, 300px);
+  }
+
+  .usability-bottom-bar__inner {
+    flex-direction: column;
+    align-items: stretch;
+    max-height: inherit;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    gap: 0.5rem;
+    padding: 0.55rem max(0.75rem, env(safe-area-inset-right)) max(0.6rem, env(safe-area-inset-bottom))
+      max(0.75rem, env(safe-area-inset-left));
+  }
+
+  .usability-bottom-bar__progress {
+    font-size: 0.88rem;
+  }
+
+  .usability-bottom-bar__title-text {
+    font-size: 1.12rem;
+  }
+
+  .usability-bottom-bar__hint {
+    -webkit-line-clamp: 5;
+    font-size: 0.92rem;
+  }
+
+  .usability-bottom-bar__actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    width: 100%;
+    gap: 0.5rem;
+  }
+
+  .usability-bottom-bar__actions .btn {
+    flex: 1 1 calc(50% - 0.25rem);
+    min-height: 44px;
+    min-width: 0;
+    touch-action: manipulation;
+  }
+
+  .usability-bottom-bar__answer {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .usability-bottom-bar__answer .btn {
+    width: 100%;
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  .usability-bottom-bar__input {
+    width: 100%;
+    min-height: 44px;
+    font-size: 16px;
+  }
+
+  body.usability-test-bottom {
+    padding-bottom: max(11.5rem, calc(env(safe-area-inset-bottom, 0px) + 10.5rem));
+  }
+
+  .usability-legal-page {
+    padding: var(--space-3) max(var(--space-3), env(safe-area-inset-left)) var(--space-5)
+      max(var(--space-3), env(safe-area-inset-right));
+  }
+
+  .usability-test-start__prose {
+    font-size: 0.95rem;
+  }
+
+  .usability-test-start__consent {
+    padding: 0.85rem;
+  }
+
+  .usability-legal-page__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .usability-legal-page__actions .btn {
+    width: 100%;
+    min-height: 48px;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 900px) {
+  .usability-bottom-bar__inner {
+    gap: 0.65rem;
+  }
+
+  .usability-bottom-bar__actions .btn {
+    min-height: 42px;
+  }
 }

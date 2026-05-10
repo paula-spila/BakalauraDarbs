@@ -1,6 +1,6 @@
 import { TEST_RESULTS_ENDPOINT } from "../config/usabilityTestEnv.js";
-import { appendResultBackupPayload } from "./usabilityTestStorage.js";
 import { getTaskSetNumberForPhase } from "../data/usabilityTestTasks.js";
+import { appendResultBackupPayload } from "./usabilityTestStorage.js";
 
 let loggedEndpointStatus = false;
 
@@ -13,12 +13,13 @@ function logEndpointOnce() {
   console.log("[test-results] VITE_TEST_RESULTS_ENDPOINT configured:", configured, preview);
 }
 
-export function taskResultId(participantId, phase, variant, taskSet, taskId) {
-  return `${participantId}-${phase}-${variant}-${taskSet}-${taskId}`;
+/** @param {string|number} taskId */
+export function taskResultId(participantId, phase, variant, taskId) {
+  return `${participantId}-${phase}-${variant}-${taskId}`;
 }
 
-export function phaseResultId(participantId, phase, variant, taskSet) {
-  return `${participantId}-phase-${phase}-${variant}-${taskSet}`;
+export function phaseResultId(participantId, phase, variant) {
+  return `${participantId}-phase-${phase}-${variant}`;
 }
 
 export function sessionResultId(participantId) {
@@ -47,26 +48,45 @@ export function mergeTaskRunsWithDedupe(prevRuns, row, resultId) {
   return arr;
 }
 
+/**
+ * @param {object} row
+ */
 export function buildTaskApiPayload(row) {
   const resultId =
     row.resultId ??
-    taskResultId(row.participantId, row.phase, row.variant, row.taskSet, row.taskId);
+    taskResultId(row.participantId, row.phase, row.variant, row.taskId);
   return {
     type: "task",
     resultId,
     participantId: row.participantId,
     testOrder: row.testOrder,
+    taskSetOrder: row.taskSetOrder ?? "",
+    taskSet: row.taskSet ?? "",
     phase: row.phase,
     variant: row.variant,
-    taskSet: row.taskSet,
     taskId: row.taskId,
     taskTitle: row.taskTitle,
     taskInstruction: row.taskInstruction,
+    successType: row.successType ?? "",
+    targetProductId: row.targetProductId ?? "",
+    targetCategoryName: row.targetCategoryName ?? "",
+    targetSection: row.targetSection ?? "",
+    targetQuantity: row.targetQuantity ?? "",
+    maxPrice: row.maxPrice ?? "",
+    minPrice: row.minPrice ?? "",
+    acceptedAnswers: row.acceptedAnswers ?? "",
+    submittedAnswer: row.submittedAnswer ?? "",
+    attemptsCount: row.attemptsCount ?? "",
+    preparedState: row.preparedState ?? "",
+    expectedCheckoutData: row.expectedCheckoutData ?? "",
+    enteredCheckoutData: row.enteredCheckoutData ?? "",
+    checkoutDataMatched: row.checkoutDataMatched ?? "",
     taskStartedAt: row.taskStartedAt,
     taskCompletedAt: row.taskCompletedAt,
     durationSeconds: row.durationSeconds,
     completed: row.completed,
     skipped: row.skipped,
+    autoCompleted: row.autoCompleted ?? "",
     clickCount: row.clickCount,
     finalUrl: row.finalUrl,
     timestamp: row.timestamp,
@@ -75,39 +95,47 @@ export function buildTaskApiPayload(row) {
 
 export function aggregatePhaseMetrics(taskRuns, phase) {
   const rows = taskRuns.filter((r) => r.phase === phase);
+  const durations = rows
+    .map((r) => Number(r.durationSeconds))
+    .filter((n) => Number.isFinite(n) && n >= 0);
+  const avg =
+    durations.length > 0
+      ? Math.round((durations.reduce((a, b) => a + b, 0) / durations.length) * 100) / 100
+      : 0;
   return {
     completedTasks: rows.filter((r) => r.completed && !r.skipped).length,
     skippedTasks: rows.filter((r) => r.skipped).length,
     totalClicks: rows.reduce((a, r) => a + (Number(r.clickCount) || 0), 0),
+    averageTaskDurationSeconds: avg,
   };
 }
 
 export function buildPhaseApiPayload(session, phase, phaseCompletedAt, taskRuns) {
   const variant = phase === 1 ? session.phase1Variant : session.phase2Variant;
-  const taskSet = getTaskSetNumberForPhase(phase);
   const phaseStartedAt =
     phase === 1 ? session.phase1StartedAt : session.phase2StartedAt;
-  const { completedTasks, skippedTasks, totalClicks } = aggregatePhaseMetrics(
-    taskRuns,
-    phase,
-  );
+  const { completedTasks, skippedTasks, totalClicks, averageTaskDurationSeconds } =
+    aggregatePhaseMetrics(taskRuns, phase);
   const durMs = new Date(phaseCompletedAt) - new Date(phaseStartedAt);
   const phaseDurationSeconds = Math.round((durMs / 1000) * 100) / 100;
-  const resultId = phaseResultId(session.participantId, phase, variant, taskSet);
+  const resultId = phaseResultId(session.participantId, phase, variant);
+  const taskSet = getTaskSetNumberForPhase(session, phase);
   return {
     type: "phase",
     resultId,
     participantId: session.participantId,
     testOrder: session.testOrder,
+    taskSetOrder: session.taskSetOrder === "21" ? "21" : "12",
+    taskSet,
     phase,
     variant,
-    taskSet,
     phaseStartedAt,
     phaseCompletedAt,
     phaseDurationSeconds,
     completedTasks,
     skippedTasks,
     totalClicks,
+    averageTaskDurationSeconds,
     timestamp: phaseCompletedAt,
   };
 }
@@ -117,11 +145,19 @@ export function buildSessionApiPayload(next) {
   const totalDurationSeconds =
     typeof meta.totalDurationSeconds === "number" ? meta.totalDurationSeconds : 0;
   const resultId = sessionResultId(next.participantId);
+  const runs = Array.isArray(next.taskRuns) ? next.taskRuns : [];
+  const totalCompletedTasks = runs.filter((r) => r.completed && !r.skipped).length;
+  const totalSkippedTasks = runs.filter((r) => r.skipped).length;
+  const totalClicks = runs.reduce((a, r) => a + (Number(r.clickCount) || 0), 0);
+  const taskSetOrder = next.taskSetOrder === "21" ? "21" : "12";
   return {
     type: "session",
     resultId,
     participantId: next.participantId,
     testOrder: next.testOrder,
+    taskSetOrder,
+    phase1TaskSet: getTaskSetNumberForPhase(next, 1),
+    phase2TaskSet: getTaskSetNumberForPhase(next, 2),
     phase1Variant: next.phase1Variant,
     phase2Variant: next.phase2Variant,
     sessionStartedAt: next.sessionStartedAt,
@@ -131,6 +167,9 @@ export function buildSessionApiPayload(next) {
     phase2CompletedAt: next.phase2CompletedAt,
     sessionCompletedAt: next.sessionCompletedAt,
     totalDurationSeconds,
+    totalCompletedTasks,
+    totalSkippedTasks,
+    totalClicks,
     userAgent: meta.userAgent ?? navigator.userAgent,
     viewportWidth: meta.viewportWidth ?? window.innerWidth,
     viewportHeight: meta.viewportHeight ?? window.innerHeight,
@@ -155,9 +194,9 @@ export function buildBatchPayload(session) {
     p.resultId
       ? p
       : {
-        ...p,
-        resultId: phaseResultId(p.participantId, p.phase, p.variant, p.taskSet),
-      },
+          ...p,
+          resultId: phaseResultId(p.participantId, p.phase, p.variant),
+        },
   );
   let sessionObj = session.sessionSummary ?? null;
   if (sessionObj && !sessionObj.resultId && session.participantId) {

@@ -1,6 +1,7 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useLocation } from "react-router-dom";
 import { Layout } from "./components/Layout.jsx";
 import { VariantSegmentToggle } from "./components/VariantSegmentToggle.jsx";
+import { useTestSession } from "./context/TestSessionContext.jsx";
 import { UsabilityTestComplete } from "./pages/UsabilityTestComplete.jsx";
 import { UsabilityTestPhaseBridge } from "./pages/UsabilityTestPhaseBridge.jsx";
 import { UsabilityTestStart } from "./pages/UsabilityTestStart.jsx";
@@ -35,12 +36,25 @@ function storeRouteList() {
   ];
 }
 
+function CornerVariantToggleHost() {
+  const { pathname } = useLocation();
+  const { session } = useTestSession();
+  const onTestRoute = pathname.startsWith("/test");
+  const activeIncompleteSession = Boolean(session && !session.sessionCompletedAt);
+  if (onTestRoute || activeIncompleteSession) {
+    return null;
+  }
+  return (
+    <div className="variant-ab-host">
+      <VariantSegmentToggle placement="corner" />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <>
-      <div className="variant-ab-host">
-        <VariantSegmentToggle placement="corner" />
-      </div>
+      <CornerVariantToggleHost />
       <Routes>
         <Route path="/test" element={<UsabilityTestStart />} />
         <Route path="/test/continue" element={<UsabilityTestPhaseBridge />} />

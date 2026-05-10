@@ -100,28 +100,47 @@ export function Shop() {
 
   const tabsAndGrid = (
     <>
-      <div className="category-tabs" role="tablist" aria-label="Preču kategorijas">
-        <button
-          type="button"
-          role="tab"
-          aria-selected={categoryId === null}
-          className={categoryId === null ? "tab tab--active" : "tab"}
-          onClick={() => setCategory(null)}
-        >
-          Visas
-        </button>
-        {PRODUCT_CATEGORIES.map((c) => (
+      <div className="shop-min-toolbar">
+        <div className="category-tabs" role="tablist" aria-label="Preču kategorijas">
           <button
-            key={c.id}
             type="button"
             role="tab"
-            aria-selected={categoryId === c.id}
-            className={categoryId === c.id ? "tab tab--active" : "tab"}
-            onClick={() => setCategory(c.id)}
+            aria-selected={categoryId === null}
+            className={categoryId === null ? "tab tab--active" : "tab"}
+            onClick={() => setCategory(null)}
           >
-            {c.label}
+            Visas
           </button>
-        ))}
+          {PRODUCT_CATEGORIES.map((c) => (
+            <button
+              key={c.id}
+              type="button"
+              role="tab"
+              aria-selected={categoryId === c.id}
+              className={categoryId === c.id ? "tab tab--active" : "tab"}
+              onClick={() => setCategory(c.id)}
+            >
+              {c.label}
+            </button>
+          ))}
+        </div>
+        <div className="shop-sort-min" role="region" aria-label="Preču kārtība">
+          <label htmlFor="shop-sort-min-select" className="shop-sort-min__label">
+            Kārtot pēc
+          </label>
+          <select
+            id="shop-sort-min-select"
+            className="shop-sort-min__select"
+            value={sortKey}
+            onChange={(e) => setSortKey(e.target.value)}
+            aria-label="Kārtot preces"
+          >
+            <option value="default">Ieteiktā secība</option>
+            <option value="price-asc">Cena: no zemākās</option>
+            <option value="price-desc">Cena: no augstākās</option>
+            <option value="name">Nosaukums (A–Ž)</option>
+          </select>
+        </div>
       </div>
       {filtered.length === 0 ? (
         <p className="empty-inline">
@@ -383,18 +402,6 @@ export function Shop() {
       </p>
       <div className="page-intro">
         <h1 className="page-title">Veikals</h1>
-        {!isRich ? (
-          <p className="lead page-intro__lead">
-            {filtered.length} {filtered.length === 1 ? "prece" : "preces"}
-            {qParam ? (
-              <>
-                {" "}
-                meklēšanai «<strong>{qParam}</strong>»
-              </>
-            ) : null}
-            . Kategorijas zemāk; meklēšanai — augšējā joslā.
-          </p>
-        ) : null}
       </div>
       {isRich ? richMain : tabsAndGrid}
     </>

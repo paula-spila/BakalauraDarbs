@@ -1,5 +1,4 @@
 :root {
-  /* Version A — apzināti minimālistiska e-komercija (neitrāls gaišs, viena akcenta līnija) */
   --bg: #fafafa;
   --surface: #ffffff;
   --text: #1a1a1a;
@@ -350,7 +349,7 @@ a:hover {
     color 0.12s ease;
 }
 
-.variant-segment--floating .variant-segment__btn + .variant-segment__btn {
+.variant-segment--floating .variant-segment__btn+.variant-segment__btn {
   border-left: none;
 }
 
@@ -418,7 +417,7 @@ a:hover {
   line-height: 1;
 }
 
-.variant-segment--header .variant-segment__btn--compact + .variant-segment__btn--compact {
+.variant-segment--header .variant-segment__btn--compact+.variant-segment__btn--compact {
   border-left: 1px solid var(--border);
 }
 
@@ -927,6 +926,62 @@ a:hover {
   margin-bottom: var(--space-5);
   padding-bottom: 0.15rem;
   border-bottom: 1px solid var(--line-subtle);
+}
+
+/* Minimālais veikals: kategorijas kreisajā pusē, kārtošana labajā */
+.shop-min-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: var(--space-3) var(--space-4);
+  margin-bottom: var(--space-5);
+  padding-bottom: 0.15rem;
+  border-bottom: 1px solid var(--line-subtle);
+}
+
+.shop-min-toolbar .category-tabs {
+  flex: 1 1 auto;
+  min-width: min(12rem, 100%);
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: none;
+}
+
+.shop-min-toolbar .shop-sort-min {
+  flex: 0 0 auto;
+  margin: 0;
+  padding: 0 0 0.1rem;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.2rem;
+}
+
+.shop-sort-min {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 1rem;
+  margin: calc(var(--space-2) * -1) 0 var(--space-4);
+  padding: 0.35rem 0;
+}
+
+.shop-sort-min__label {
+  font-size: var(--font-sm);
+  font-weight: 600;
+  color: var(--text);
+}
+
+.shop-sort-min__select {
+  font: inherit;
+  font-size: var(--font-sm);
+  padding: 0.45rem 2rem 0.45rem 0.65rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--text);
+  min-width: min(12rem, 100%);
+  max-width: 100%;
 }
 
 .tab {
@@ -1944,7 +1999,7 @@ a:hover {
   color: var(--muted);
 }
 
-.a-block p + p {
+.a-block p+p {
   margin-top: var(--space-2);
 }
 
@@ -2054,7 +2109,7 @@ a:hover {
   color: var(--text);
 }
 
-.prose > p:first-of-type {
+.prose>p:first-of-type {
   margin-top: 0;
 }
 
@@ -2216,6 +2271,7 @@ body {
 }
 
 @media (max-width: 900px) {
+
   .site-main,
   .site-main--wide {
     padding-left: max(var(--space-2), env(safe-area-inset-left, 0px));
@@ -2273,6 +2329,17 @@ body {
 
   .app-wrap--a .site-nav__link {
     padding: 0.55rem 0.75rem;
+  }
+
+  .shop-min-toolbar {
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: var(--space-2);
+  }
+
+  .shop-min-toolbar .category-tabs {
+    flex: 1 1 0;
+    min-width: 0;
   }
 
   .category-tabs {

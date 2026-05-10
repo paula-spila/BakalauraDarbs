@@ -1,19 +1,36 @@
 import { USABILITY_SESSION_STORAGE_KEY } from "./usabilityTestStorage.js";
 
 const CSV_COLUMNS = [
+  "resultId",
   "participantId",
   "testOrder",
+  "taskSetOrder",
+  "taskSet",
   "phase",
   "variant",
-  "taskSet",
   "taskId",
   "taskTitle",
   "taskInstruction",
+  "successType",
+  "targetProductId",
+  "targetCategoryName",
+  "targetSection",
+  "targetQuantity",
+  "maxPrice",
+  "minPrice",
+  "acceptedAnswers",
+  "submittedAnswer",
+  "attemptsCount",
+  "preparedState",
+  "expectedCheckoutData",
+  "enteredCheckoutData",
+  "checkoutDataMatched",
   "taskStartedAt",
   "taskCompletedAt",
   "durationSeconds",
   "completed",
   "skipped",
+  "autoCompleted",
   "clickCount",
   "finalUrl",
   "timestamp",
@@ -37,20 +54,21 @@ function rowFromTask(t) {
 /**
  * @param {{ taskRuns?: object[], sessionMeta?: object }} session
  */
-export function buildTasksCsv(session) {
+function buildTasksCsv(session) {
   const rows = [CSV_COLUMNS.join(",")];
   const runs = Array.isArray(session?.taskRuns) ? session.taskRuns : [];
   for (const t of runs) {
+    if (t._attemptsOnly) continue;
     rows.push(rowFromTask(t).join(","));
   }
   return rows.join("\r\n");
 }
 
-export function buildSessionJsonBlob(session) {
+function buildSessionJsonBlob(session) {
   return JSON.stringify(session ?? {}, null, 2);
 }
 
-export function triggerDownload(filename, content, mime) {
+function triggerDownload(filename, content, mime) {
   const blob = new Blob([content], { type: mime });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
@@ -86,28 +104,6 @@ export function downloadSessionCsvOnly() {
     if (!raw) return false;
     const session = JSON.parse(raw);
     const pid = session?.participantId ?? "session";
-    triggerDownload(
-      `usability-test-${pid}.csv`,
-      buildTasksCsv(session),
-      "text/csv;charset=utf-8",
-    );
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-export function downloadSessionExportsFromStorage() {
-  try {
-    const raw = localStorage.getItem(USABILITY_SESSION_STORAGE_KEY);
-    if (!raw) return false;
-    const session = JSON.parse(raw);
-    const pid = session?.participantId ?? "session";
-    triggerDownload(
-      `usability-test-${pid}.json`,
-      buildSessionJsonBlob(session),
-      "application/json;charset=utf-8",
-    );
     triggerDownload(
       `usability-test-${pid}.csv`,
       buildTasksCsv(session),

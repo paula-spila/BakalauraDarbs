@@ -56,12 +56,12 @@ export function UsabilityTestStart() {
   }
 
   return (
-    <div className="usability-legal-page">
-      <div className="usability-legal-page__inner">
-        <h1 className="page-title">Lietojamības testa sākums</h1>
+    <div className="usability-legal-page usability-test-start">
+      <div className="usability-legal-page__inner usability-test-start__inner">
+        <h1 className="usability-test-start__h1">Lietojamības tests</h1>
 
         {activeIncomplete ? (
-          <div className="usability-callout usability-callout--info">
+          <div className="usability-callout usability-callout--info usability-test-start__resume">
             <p>
               <strong>Jums ir nepabeigts tests.</strong> Varat turpināt tur, kur apstājāties, vai sākt
               no jauna (dzēsīs sesijas datus šajā pārlūkā).
@@ -84,38 +84,97 @@ export function UsabilityTestStart() {
           </div>
         ) : null}
 
-        <p>
-          Šis tests ir daļa no bakalaura darba praktiskā pētījuma. Testa laikā būs jāizpilda vairāki
-          uzdevumi divās demonstrācijas e-veikala versijās.
-        </p>
-        <p>
-          <strong>Maksājumi netiek veikti.</strong> Visi pasūtījumi un maksājumi ir simulācija.
-        </p>
-        <p>
-          Tiks mērīts uzdevumu izpildes laiks, klikšķu skaits un tas, vai uzdevums tika pabeigts.
-        </p>
-        <p>Dati tiek vākti anonīmi. Netiek prasīts vārds, uzvārds vai e-pasts.</p>
+        <div className="usability-test-start__prose">
+          <p>
+            Šis tests ir daļa no bakalaura darba praktiskā pētījuma par minimālisma dizaina ietekmi uz
+            lietotāja efektivitāti. Testa laikā Jums būs jāizpilda vairāki uzdevumi divās demonstrācijas
+            e-veikala versijās.
+          </p>
 
-        <label className="usability-consent">
+          <p>
+            Abās versijās būs jāveic līdzīgi uzdevumi (atšķiras detaļas, piemēram, produkti un kategorijas), piemēram,
+            jāatrod konkrēti produkti vai jāatrod noteikta informācija.
+          </p>
+
+          <h2 className="usability-test-start__h2">Kā tests notiks?</h2>
+
+          <ul className="usability-test-start__list">
+            <li>
+              Tests sastāv no divām daļām - vispirms tiks izmantota viena vietnes versija, pēc tam otra.
+            </li>
+            <li>Pirms katra uzdevuma ekrānā būs redzama uzdevuma instrukcija.</li>
+            <li>Laika mērīšana sāksies tikai tad, kad nospiedīsiet pogu „Sākt uzdevumu”.</li>
+            <li>
+              Daži uzdevumi tiks pabeigti automātiski, piemēram, kad būs atvērta pareizā produkta lapa vai
+              grozs.
+            </li>
+            <li>
+              Uzdevumos, kuros jāatrod konkrēta informācija, būs jāievada atrastā atbilde testa joslā
+              ekrāna lejasdaļā.
+            </li>
+            <li>Ja uzdevumu neizdodas izpildīt, to būs iespējams izlaist.</li>
+          </ul>
+
+          <h2 className="usability-test-start__h2">Kas tiks mērīts?</h2>
+
+          <p>
+            Testa laikā tiks mērīts uzdevumu izpildes laiks, klikšķu skaits un tas, vai uzdevums tika
+            pabeigts vai izlaists. Šie dati tiks izmantoti tikai pētījuma rezultātu analīzei.
+          </p>
+
+          <h2 className="usability-test-start__h2">Svarīga informācija</h2>
+
+          <ul className="usability-test-start__list">
+            <li>
+              <strong>Maksājumi netiek veikti.</strong> Visi pasūtījumi un maksājumi šajā vietnē ir
+              simulācija.
+            </li>
+            <li>Vietne ir demonstrācijas prototips, tāpēc tajā nav jāizmanto īsti personas dati.</li>
+            <li>Pasūtījuma formā izmantojiet tikai testam norādītos datus.</li>
+            <li>Dati tiek vākti anonīmi. Netiek prasīts Jūsu vārds, uzvārds vai e-pasts.</li>
+          </ul>
+
+          <h2 className="usability-test-start__h2">Pēc uzdevumu izpildes</h2>
+
+          <p>
+            Kad būs pabeigtas abas vietnes versijas, Jūs tiksiet aicināts aizpildīt īsu Google Forms
+            anketu. Anketā būs jānovērtē abu vietnes versiju lietošanas pieredze un jāatbild uz dažiem
+            salīdzinošiem jautājumiem.
+          </p>
+
+          <p>
+            Lūdzu, testu veiciet patstāvīgi un mēģiniet izpildīt uzdevumus tā, kā Jūs to darītu reālā
+            e-veikalā.
+          </p>
+        </div>
+
+        <label className="usability-consent usability-test-start__consent">
           <input
             type="checkbox"
             checked={consent}
             onChange={(e) => setConsent(e.target.checked)}
           />
-          <span>Piekrītu piedalīties testā</span>
+          <span>
+            Sākot testu, Jūs apstiprināt, ka saprotat testa norisi un piekrītat anonīmai lietošanas datu
+            apkopošanai pētījuma vajadzībām.
+          </span>
         </label>
 
-        <div className="usability-legal-page__actions">
+        <div className="usability-legal-page__actions usability-test-start__actions">
           <button type="button" className="btn" disabled={!consent} onClick={handleStart}>
             Sākt testu
           </button>
         </div>
 
-        <p className="muted usability-hint">
+        <p className="muted usability-hint usability-test-start__debug">
           Debug:{" "}
-          <Link to="/test?order=AB">AB secība</Link>
+          <Link to="/test?reset=true&order=AB&taskSetOrder=12">AB+12</Link>
           {" · "}
-          <Link to="/test?order=BA">BA secība</Link>
+          <Link to="/test?reset=true&order=AB&taskSetOrder=21">AB+21</Link>
+          {" · "}
+          <Link to="/test?reset=true&order=BA&taskSetOrder=12">BA+12</Link>
+          {" · "}
+          <Link to="/test?reset=true&order=BA&taskSetOrder=21">BA+21</Link>
           {" · "}
           <Link to="/test?reset=true">Notīrīt sesiju</Link>
         </p>

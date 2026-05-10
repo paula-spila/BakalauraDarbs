@@ -29,7 +29,6 @@ export function useVariant() {
   return useContext(VariantContext);
 }
 
-/** Same path shape as before (/veikals, /informacija#buj); adds /rich when needed. */
 export function usePrefixedTo() {
   const { pathPrefix } = useVariant();
   return useCallback(

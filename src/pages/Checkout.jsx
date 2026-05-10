@@ -1,8 +1,10 @@
-import { useEffect, useState, useCallback } from "react";
-import { Link } from "react-router-dom";
+import { useEffect, useState, useCallback, useRef } from "react";
+import { Link, useLocation } from "react-router-dom";
 import { formatEur } from "../lib/formatEur.js";
+import { getTasksForPhase } from "../data/usabilityTestTasks.js";
 import { useCart } from "../context/CartContext.jsx";
 import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
+import { useTestSession } from "../context/TestSessionContext.jsx";
 
 function TrustMini() {
   return (
@@ -15,10 +17,13 @@ function TrustMini() {
 }
 
 export function Checkout() {
+  const { pathname } = useLocation();
   const { thanksSessionKey, isRich } = useVariant();
   const to = usePrefixedTo();
   const { lines, subtotal, clearCart } = useCart();
+  const { session, measuring } = useTestSession();
   const [formError, setFormError] = useState("");
+  const checkoutPrefillAppliedRef = useRef("");
 
   const readThanksFlag = useCallback(() => {
     try {
@@ -46,6 +51,7 @@ export function Checkout() {
 
   const [fullname, setFullname] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [postal, setPostal] = useState("");
@@ -58,6 +64,35 @@ export function Checkout() {
       clearThanksFlag();
     }
   }, [lines.length, clearThanksFlag]);
+
+  useEffect(() => {
+    const pid = session?.participantId ?? "";
+    if (!pid || session?.sessionCompletedAt) {
+      checkoutPrefillAppliedRef.current = "";
+      return;
+    }
+    if (!measuring || !pathname.toLowerCase().includes("noformesana")) {
+      return;
+    }
+    const tasks = getTasksForPhase(session);
+    const idx = session.currentTaskIndex ?? 0;
+    const task = tasks[idx];
+    if (!task || task.successType !== "checkoutFormFilled" || !task.checkoutTestData) {
+      return;
+    }
+    const key = `${pid}-${session.currentPhase}-${task.id}`;
+    if (checkoutPrefillAppliedRef.current === key) {
+      return;
+    }
+    const d = task.checkoutTestData;
+    setFullname(String(d.name ?? ""));
+    setEmail(String(d.email ?? ""));
+    setAddress(String(d.street ?? ""));
+    setCity(String(d.city ?? ""));
+    setPostal(String(d.postalCode ?? ""));
+    setPhone(String(d.phone ?? ""));
+    checkoutPrefillAppliedRef.current = key;
+  }, [measuring, pathname, session]);
 
   if (lines.length === 0 && !showThankYou) {
     return (
@@ -170,6 +205,17 @@ export function Checkout() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
           />
+          <label htmlFor="phone">Tālrunis (neobligāti)</label>
+          <input
+            id="phone"
+            className="checkout-input"
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            inputMode="tel"
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+          />
         </fieldset>
       </div>
       <div className="checkout-form__panel">
@@ -257,6 +303,15 @@ export function Checkout() {
           autoComplete="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+        <label htmlFor="phone-rich">Tālrunis (neobligāti)</label>
+        <input
+          id="phone-rich"
+          name="phone"
+          type="tel"
+          autoComplete="tel"
+          value={phone}
+          onChange={(e) => setPhone(e.target.value)}
         />
       </fieldset>
       <h2 className="rich-co-section-title" id="rich-co-h-address">

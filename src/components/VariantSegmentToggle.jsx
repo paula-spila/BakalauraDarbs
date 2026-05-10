@@ -2,8 +2,7 @@ import { NavLink, useLocation } from "react-router-dom";
 import { pathsForVariantToggle } from "../lib/variantPaths.js";
 
 /**
- * Version A (minimal) ↔ Version B (rich), same tab. Preserves path + query.
- * @param {"floating" | "inline" | "header" | "corner"} placement — corner = fiksēti kreisajā augšējā stūrī (ārpus veikala UI)
+ * @param {"floating" | "inline" | "header" | "corner"} placement
  */
 export function VariantSegmentToggle({ placement = "floating" }) {
   const { pathname, search } = useLocation();

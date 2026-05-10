@@ -1,4 +1,3 @@
-/** Decorative stars for Version B (thesis demo — not real reviews). */
 export function StarRow({ rating = 4, className = "" }) {
   const r = Math.min(5, Math.max(1, Math.round(Number(rating) || 4)));
   return (

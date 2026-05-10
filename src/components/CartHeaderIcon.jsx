@@ -1,4 +1,3 @@
-/** Inline cart icon for header (variant A); inherits `currentColor`. */
 export function CartHeaderIcon() {
   return (
     <svg

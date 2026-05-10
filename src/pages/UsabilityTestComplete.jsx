@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useTestSession } from "../context/TestSessionContext.jsx";
 import { submitBatchResultsNonBlocking } from "../lib/batchTestResults.js";
@@ -6,7 +6,6 @@ import { markSessionBatchUploadFinished, readRawSession } from "../lib/usability
 
 export function UsabilityTestComplete() {
   const navigate = useNavigate();
-  const formRedirectStarted = useRef(false);
   const [batchSheetStatus, setBatchSheetStatus] = useState("idle");
   const {
     session,
@@ -79,18 +78,21 @@ export function UsabilityTestComplete() {
   }, [s?.sessionCompletedAt, s?.participantId, runBatchUpload, s]);
 
   useEffect(() => {
-    const current = session ?? readRawSession();
-    if (!current?.sessionCompletedAt || !isGoogleFormConfigured) return;
-    const url = buildGoogleFormUrl(current);
-    if (!url || formRedirectStarted.current) return;
-    formRedirectStarted.current = true;
-    window.location.replace(url);
+    const fresh = readRawSession();
+    if (!fresh?.sessionCompletedAt) return undefined;
+    if (!isGoogleFormConfigured) return undefined;
+    const formUrl = buildGoogleFormUrl(fresh);
+    if (!formUrl) return undefined;
+    const t = window.setTimeout(() => {
+      window.location.assign(formUrl);
+    }, 800);
+    return () => window.clearTimeout(t);
   }, [
-    session?.sessionCompletedAt,
-    session?.participantId,
-    session?.testOrder,
-    session?.phase1Variant,
-    session?.phase2Variant,
+    s?.sessionCompletedAt,
+    s?.participantId,
+    s?.testOrder,
+    s?.phase1Variant,
+    s?.phase2Variant,
     isGoogleFormConfigured,
     buildGoogleFormUrl,
   ]);
@@ -110,14 +112,23 @@ export function UsabilityTestComplete() {
   return (
     <div className="usability-legal-page">
       <div className="usability-legal-page__inner">
-        <h1 className="page-title">Paldies</h1>
-        <p>Paldies, abas testēšanas daļas ir pabeigtas.</p>
+        <h1 className="page-title">Paldies, praktiskā testa daļa ir pabeigta.</h1>
+        <p>
+          <strong>Dalībnieka ID:</strong> {s.participantId}
+        </p>
+        <p>
+          Lūdzu, aizpildiet īsu Google Forms anketu par testa pieredzi.
+        </p>
+
+        <div className="usability-legal-page__actions" style={{ marginBottom: "1.25rem" }}>
+          {isGoogleFormConfigured && formUrl ? (
+            <a className="btn" href={formUrl} target="_blank" rel="noopener noreferrer">
+              Atvērt anketu
+            </a>
+          ) : null}
+        </div>
 
         <dl className="usability-panel__meta usability-complete__meta">
-          <div>
-            <dt>Dalībnieka ID</dt>
-            <dd>{s.participantId}</dd>
-          </div>
           <div>
             <dt>Secība</dt>
             <dd>{s.testOrder}</dd>
@@ -166,18 +177,8 @@ export function UsabilityTestComplete() {
           </div>
         ) : null}
 
-        {isGoogleFormConfigured && formUrl ? (
-          <p className="muted">
-            Ja anketa neatvērās automātiski,{" "}
-            <a href={formUrl} target="_blank" rel="noopener noreferrer">
-              atveriet to šeit
-            </a>
-            .
-          </p>
-        ) : null}
-
         <div className="usability-legal-page__actions usability-complete__export">
-          <p className="muted">Lejupielādējiet lokālos datus pētniecībai (vienmēr pieejams).</p>
+          <p className="muted">Rezerves kopija pētniecībai (JSON un CSV).</p>
           <button type="button" className="btn btn--ghost" onClick={downloadExportJson}>
             Lejupielādēt rezultātus JSON
           </button>

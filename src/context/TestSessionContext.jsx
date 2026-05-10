@@ -20,7 +20,12 @@ import {
   FORM_PHASE1_VARIANT_ENTRY,
   FORM_PHASE2_VARIANT_ENTRY,
 } from "../config/usabilityTestEnv.js";
-import { getTasksForPhase } from "../data/usabilityTestTasks.js";
+import { getProductById } from "../data/products.js";
+import {
+  getTaskCount,
+  getTasksForPhase,
+  getTaskSetNumberForPhase,
+} from "../data/usabilityTestTasks.js";
 import {
   buildPhaseApiPayload,
   buildSessionApiPayload,
@@ -28,6 +33,7 @@ import {
   mergeTaskRunsWithDedupe,
   taskResultId,
 } from "../lib/batchTestResults.js";
+import { answerMatchesAccepted } from "../lib/normalizeAnswer.js";
 import {
   downloadSessionCsvOnly,
   downloadSessionJsonOnly,
@@ -38,7 +44,12 @@ import {
   readRawSession,
   writeRawSession,
 } from "../lib/usabilityTestStorage.js";
-import { UsabilityTestPanel } from "../components/UsabilityTestPanel.jsx";
+import {
+  checkoutEnteredMatchesExpected,
+  evaluateAutoTaskSuccess,
+  getEnteredCheckoutSnapshot,
+} from "../lib/usabilityTaskSuccess.js";
+import { UsabilityTestChrome } from "../components/UsabilityTestChrome.jsx";
 import { useCart } from "./CartContext.jsx";
 
 const TestSessionContext = createContext(null);
@@ -69,6 +80,12 @@ function pickTestOrder(searchParams) {
   return Math.random() < 0.5 ? "AB" : "BA";
 }
 
+function pickTaskSetOrder(searchParams) {
+  const t = (searchParams.get("taskSetOrder") ?? "").trim();
+  if (t === "12" || t === "21") return t;
+  return Math.random() < 0.5 ? "12" : "21";
+}
+
 function targetLabelFromEvent(ev) {
   const el = ev.target;
   if (!el || typeof el !== "object") return "";
@@ -80,42 +97,83 @@ function targetLabelFromEvent(ev) {
   return "";
 }
 
+function migrateSessionShape(s) {
+  if (!s) return s;
+  let next = { ...s };
+  if (next.taskSetOrder !== "12" && next.taskSetOrder !== "21") {
+    next = { ...next, taskSetOrder: "12" };
+  }
+  const tc = getTaskCount();
+  if (!next.testUi) {
+    if (next.activeMeasurement?.taskStartedAt) {
+      return { ...next, testUi: "active" };
+    }
+    return { ...next, testUi: "intro" };
+  }
+  if (typeof next.currentTaskIndex === "number" && next.currentTaskIndex >= tc) {
+    return { ...next, currentTaskIndex: tc - 1 };
+  }
+  return next;
+}
+
 export function TestSessionProvider({ children }) {
-  const { pathname } = useLocation();
+  const { pathname, hash } = useLocation();
   const navigate = useNavigate();
-  const { clearCart } = useCart();
-  const [session, setSession] = useState(() => readRawSession());
+  const { clearCart, lines, addToCart } = useCart();
+  const [session, setSession] = useState(() => migrateSessionShape(readRawSession()));
   const [measuring, setMeasuring] = useState(() => {
-    const s = readRawSession();
+    const s = migrateSessionShape(readRawSession());
     return Boolean(s?.activeMeasurement?.taskStartedAt);
   });
   const [clickCount, setClickCount] = useState(
-    () => readRawSession()?.activeMeasurement?.clickCount ?? 0,
+    () => migrateSessionShape(readRawSession())?.activeMeasurement?.clickCount ?? 0,
   );
   const [isCompletingTask, setIsCompletingTask] = useState(false);
+  const [instructionPeekOpen, setInstructionPeekOpen] = useState(false);
+  const [answerDraft, setAnswerDraft] = useState("");
+  const [answerError, setAnswerError] = useState("");
+  const [outcomeMeta, setOutcomeMeta] = useState(() => ({}));
+
   const sessionRef = useRef(session);
   const measureClicksRef = useRef(0);
   const finishingTaskRef = useRef(false);
+  const completedIdsRef = useRef(new Set());
+  const task7PreparedRef = useRef(false);
+  const wrongAnswerStreakRef = useRef(0);
   sessionRef.current = session;
 
+  const setAnswerDraftAndClearError = useCallback((next) => {
+    setAnswerError("");
+    setAnswerDraft(next);
+  }, []);
+
+  useEffect(() => {
+    const ids = new Set(
+      (session?.taskRuns ?? []).map((r) => r.resultId).filter(Boolean),
+    );
+    completedIdsRef.current = ids;
+  }, [session?.taskRuns]);
+
   const commitSession = useCallback((next) => {
-    sessionRef.current = next;
-    writeRawSession(next);
-    setSession(next);
+    const m = migrateSessionShape(next);
+    sessionRef.current = m;
+    writeRawSession(m);
+    setSession(m);
   }, []);
 
   const persist = useCallback((updater) => {
     setSession((prev) => {
-      const base = prev ? { ...prev } : {};
+      const base = migrateSessionShape(prev ? { ...prev } : {});
       const next = typeof updater === "function" ? updater(base) : updater;
-      writeRawSession(next);
-      return next;
+      const m = migrateSessionShape(next);
+      writeRawSession(m);
+      return m;
     });
   }, []);
 
   const refreshFromStorage = useCallback(() => {
-    setSession(readRawSession());
-    const s = readRawSession();
+    const s = migrateSessionShape(readRawSession());
+    setSession(s);
     setMeasuring(Boolean(s?.activeMeasurement?.taskStartedAt));
     setClickCount(s?.activeMeasurement?.clickCount ?? 0);
   }, []);
@@ -125,9 +183,15 @@ export function TestSessionProvider({ children }) {
     clearAllCartAndCheckoutStorage();
     clearCart();
     measureClicksRef.current = 0;
+    task7PreparedRef.current = false;
+    wrongAnswerStreakRef.current = 0;
     setSession(null);
     setMeasuring(false);
     setClickCount(0);
+    setInstructionPeekOpen(false);
+    setAnswerDraft("");
+    setAnswerError("");
+    setOutcomeMeta({});
   }, [clearCart]);
 
   const isTestPath =
@@ -135,18 +199,20 @@ export function TestSessionProvider({ children }) {
     pathname === "/test/continue" ||
     pathname === "/test/complete";
 
-  const awaitingPhase2Bridge =
+  const awaitingPhase2Bridge = Boolean(
     session &&
-    session.currentPhase === 1 &&
-    (session.currentTaskIndex ?? 0) >= 8 &&
-    session.phase1CompletedAt &&
-    !session.phase2StartedAt;
+      session.phase1CompletedAt &&
+      !session.phase2StartedAt &&
+      !session.sessionCompletedAt,
+  );
 
-  const showPanel = Boolean(
+  const outcomeNeedsAck = session?.testUi === "outcome";
+
+  const showChrome = Boolean(
     session &&
-      !session.sessionCompletedAt &&
+      (!session.sessionCompletedAt || outcomeNeedsAck) &&
+      (!awaitingPhase2Bridge || outcomeNeedsAck) &&
       !isTestPath &&
-      !awaitingPhase2Bridge &&
       (pathname === "/" ||
         pathname.startsWith("/veikals") ||
         pathname.startsWith("/produkts") ||
@@ -163,14 +229,23 @@ export function TestSessionProvider({ children }) {
         pathname.startsWith("/rich/")),
   );
 
+  const testUi = session?.testUi ?? "intro";
+  const introOpen = Boolean(showChrome && testUi === "intro" && !measuring);
+  const outcomeOpen = Boolean(showChrome && testUi === "outcome" && !measuring);
+
   useEffect(() => {
     const active =
       Boolean(session) &&
-      !session?.sessionCompletedAt &&
+      (!session?.sessionCompletedAt || outcomeNeedsAck) &&
+      (!awaitingPhase2Bridge || outcomeNeedsAck) &&
       !isTestPath;
     document.body.classList.toggle("usability-test-active", active);
-    return () => document.body.classList.remove("usability-test-active");
-  }, [session, isTestPath]);
+    document.body.classList.toggle("usability-test-bottom", Boolean(measuring && showChrome));
+    return () => {
+      document.body.classList.remove("usability-test-active");
+      document.body.classList.remove("usability-test-bottom");
+    };
+  }, [session, isTestPath, awaitingPhase2Bridge, measuring, showChrome, outcomeNeedsAck]);
 
   useEffect(() => {
     function onVis() {
@@ -186,7 +261,7 @@ export function TestSessionProvider({ children }) {
     const onPointerDown = (ev) => {
       if (ev.button !== 0 && ev.button !== undefined) return;
       const t = ev.target;
-      if (t && typeof t.closest === "function" && t.closest("[data-usability-panel]")) {
+      if (t && typeof t.closest === "function" && t.closest("[data-usability-chrome]")) {
         return;
       }
       measureClicksRef.current += 1;
@@ -220,106 +295,161 @@ export function TestSessionProvider({ children }) {
     return () => document.removeEventListener("pointerdown", onPointerDown, true);
   }, [measuring, session?.activeMeasurement, persist]);
 
-  const beginCurrentTask = useCallback(() => {
+  useEffect(() => {
     const s = sessionRef.current;
-    if (!s || s.sessionCompletedAt) return;
-    const phase = s.currentPhase;
-    const tasks = getTasksForPhase(phase);
+    if (!s || s.sessionCompletedAt || !introOpen) return;
+    const tasks = getTasksForPhase(s);
     const idx = s.currentTaskIndex ?? 0;
     const task = tasks[idx];
-    if (!task) return;
-    const startedAt = new Date().toISOString();
-    measureClicksRef.current = 0;
-    setClickCount(0);
-    setMeasuring(true);
-    persist((prev) => ({
-      ...prev,
-      activeMeasurement: {
-        taskId: task.id,
-        taskStartedAt: startedAt,
-        clickCount: 0,
-        actionLog: [],
-      },
-    }));
-  }, [persist]);
+    if (!task || task.successType !== "cartQuantity") return;
+    const pid = Number(task.targetProductId);
+    if (!Number.isFinite(pid)) return;
+    const line = lines.find((l) => Number(l.productId) === pid);
+    if (line) return;
+    const p = getProductById(pid);
+    if (!p) return;
+    addToCart(pid, 1, { name: p.name, unitPrice: p.price });
+    task7PreparedRef.current = true;
+  }, [introOpen, lines, addToCart, session?.currentTaskIndex, session?.taskSetOrder]);
 
-  const finishCurrentTask = useCallback(
-    ({ completed, skipped }) => {
+  const finalizeTask = useCallback(
+    ({
+      completed,
+      skipped,
+      autoCompleted,
+      submittedAnswer,
+      attemptsCount,
+      preparedState,
+    }) => {
       if (finishingTaskRef.current) return;
       const s = sessionRef.current;
       if (!s?.activeMeasurement) return;
       const phase = s.currentPhase;
-      const tasks = getTasksForPhase(phase);
+      const tasks = getTasksForPhase(s);
       const idx = s.currentTaskIndex ?? 0;
       const task = tasks[idx];
       if (!task) return;
 
+      const variant = phase === 1 ? s.phase1Variant : s.phase2Variant;
+      const taskSet = getTaskSetNumberForPhase(s, phase);
+      const taskSetOrder = s.taskSetOrder === "21" ? "21" : "12";
+      const resultId = taskResultId(s.participantId, phase, variant, task.id);
+      if (completedIdsRef.current.has(resultId)) {
+        return;
+      }
       finishingTaskRef.current = true;
       flushSync(() => setIsCompletingTask(true));
       try {
-        const taskSet = phase === 1 ? 1 : 2;
-        const variant = phase === 1 ? s.phase1Variant : s.phase2Variant;
         const started = s.activeMeasurement.taskStartedAt;
         const completedAt = new Date().toISOString();
         const durationMs = new Date(completedAt) - new Date(started);
         const durationSeconds = Math.round((durationMs / 1000) * 100) / 100;
         const clicks = measureClicksRef.current;
         const logSlice = (s.activeMeasurement.actionLog ?? []).slice(0, 40);
-        const resultId = taskResultId(s.participantId, phase, variant, taskSet, task.id);
+
+        const prepForRow =
+          task.successType === "cartQuantity"
+            ? task7PreparedRef.current
+            : Boolean(preparedState);
+
+        const enteredSnap =
+          task.successType === "checkoutFormFilled"
+            ? getEnteredCheckoutSnapshot()
+            : null;
+        const checkoutDataMatched =
+          task.successType === "checkoutFormFilled" && enteredSnap
+            ? checkoutEnteredMatchesExpected(task, enteredSnap)
+            : "";
+
         const row = {
           participantId: s.participantId,
           testOrder: s.testOrder,
+          taskSetOrder,
+          taskSet,
           phase,
           variant,
-          taskSet,
           taskId: task.id,
           taskTitle: task.title,
           taskInstruction: task.instruction,
+          successType: task.successType,
+          targetProductId: task.targetProductId ?? "",
+          targetCategoryName: task.targetCategoryName ?? "",
+          targetSection: task.targetSection ?? "",
+          targetQuantity: task.targetQuantity ?? "",
+          maxPrice: task.maxPrice ?? "",
+          minPrice: task.minPrice ?? "",
+          acceptedAnswers: Array.isArray(task.acceptedAnswers)
+            ? task.acceptedAnswers.join("|")
+            : "",
+          submittedAnswer: submittedAnswer ?? "",
+          attemptsCount: attemptsCount ?? 0,
+          preparedState: prepForRow,
+          expectedCheckoutData:
+            task.successType === "checkoutFormFilled"
+              ? JSON.stringify(task.checkoutTestData ?? {})
+              : "",
+          enteredCheckoutData:
+            task.successType === "checkoutFormFilled" && enteredSnap
+              ? JSON.stringify(enteredSnap)
+              : "",
+          checkoutDataMatched,
           taskStartedAt: started,
           taskCompletedAt: completedAt,
           durationSeconds,
           completed: Boolean(completed),
           skipped: Boolean(skipped),
+          autoCompleted: Boolean(autoCompleted),
           clickCount: clicks,
           finalUrl: window.location.href,
           timestamp: completedAt,
-          expectedArea: task.expectedArea ?? "",
           actionLog: logSlice,
         };
 
+        const taskRuns = mergeTaskRunsWithDedupe(s.taskRuns, row, resultId);
+        completedIdsRef.current.add(resultId);
+
         setMeasuring(false);
         measureClicksRef.current = 0;
+        setClickCount(0);
+        setInstructionPeekOpen(false);
+        setAnswerDraft("");
+        setAnswerError("");
 
-        const taskRuns = mergeTaskRunsWithDedupe(s.taskRuns, row, resultId);
-        const nextIdx = idx + 1;
-        const isLastTaskInPhase = idx === 7;
+        const lastInPhase = idx >= tasks.length - 1;
 
-        if (!isLastTaskInPhase) {
-          const next = {
+        const homeForCurrentVariant = homePathForVariant(
+          phase === 1 ? s.phase1Variant : s.phase2Variant,
+        );
+
+        if (!lastInPhase) {
+          commitSession({
             ...s,
             taskRuns,
-            currentTaskIndex: nextIdx,
             activeMeasurement: null,
-          };
-          commitSession(next);
-          setClickCount(0);
+            testUi: "outcome",
+          });
+          setOutcomeMeta({ skipped, completed, phase1End: false, sessionEnd: false });
+          if (completed && !skipped) {
+            navigate(homeForCurrentVariant, { replace: true });
+          }
           return;
         }
 
         if (phase === 1) {
           const p1Done = completedAt;
           const phase1Payload = buildPhaseApiPayload(s, 1, p1Done, taskRuns);
-          const next = {
+          commitSession({
             ...s,
             taskRuns,
-            currentTaskIndex: 8,
             activeMeasurement: null,
             phase1CompletedAt: p1Done,
             phaseResults: mergePhaseResults(s.phaseResults, phase1Payload),
-          };
-          commitSession(next);
-          setClickCount(0);
-          navigate("/test/continue");
+            testUi: "outcome",
+          });
+          setOutcomeMeta({ phase1End: true, skipped, completed });
+          if (completed && !skipped) {
+            navigate(homeForCurrentVariant, { replace: true });
+          }
           return;
         }
 
@@ -331,7 +461,6 @@ export function TestSessionProvider({ children }) {
         const nextBase = {
           ...s,
           taskRuns,
-          currentTaskIndex: 8,
           activeMeasurement: null,
           phase2CompletedAt: p2Done,
           sessionCompletedAt: p2Done,
@@ -342,15 +471,17 @@ export function TestSessionProvider({ children }) {
             viewportHeight: window.innerHeight,
           },
           phaseResults: mergePhaseResults(s.phaseResults, phase2Payload),
+          testUi: "outcome",
         };
         const sessionSummary = buildSessionApiPayload(nextBase);
-        const next = {
+        commitSession({
           ...nextBase,
           sessionSummary,
-        };
-        commitSession(next);
-        setClickCount(0);
-        navigate("/test/complete");
+        });
+        setOutcomeMeta({ sessionEnd: true, skipped, completed });
+        if (completed && !skipped) {
+          navigate(homeForCurrentVariant, { replace: true });
+        }
       } finally {
         finishingTaskRef.current = false;
         setIsCompletingTask(false);
@@ -359,22 +490,184 @@ export function TestSessionProvider({ children }) {
     [commitSession, navigate],
   );
 
-  const completeCurrentTask = useCallback(() => {
-    finishCurrentTask({ completed: true, skipped: false });
-  }, [finishCurrentTask]);
+  const beginCurrentTask = useCallback(() => {
+    const s = sessionRef.current;
+    if (!s || s.sessionCompletedAt || s.testUi !== "intro") return;
+    const phase = s.currentPhase;
+    const tasks = getTasksForPhase(s);
+    const idx = s.currentTaskIndex ?? 0;
+    const task = tasks[idx];
+    if (!task) return;
+    const startedAt = new Date().toISOString();
+    measureClicksRef.current = 0;
+    setClickCount(0);
+    wrongAnswerStreakRef.current = 0;
+    setMeasuring(true);
+    setAnswerDraft("");
+    setAnswerError("");
+    persist((prev) => ({
+      ...prev,
+      testUi: "active",
+      activeMeasurement: {
+        taskId: task.id,
+        taskStartedAt: startedAt,
+        clickCount: 0,
+        actionLog: [],
+      },
+    }));
+  }, [persist]);
 
   const skipCurrentTask = useCallback(() => {
-    finishCurrentTask({ completed: false, skipped: true });
-  }, [finishCurrentTask]);
+    if (!measuring || !sessionRef.current?.activeMeasurement) return;
+    finalizeTask({
+      completed: false,
+      skipped: true,
+      autoCompleted: false,
+      submittedAnswer: "",
+      attemptsCount: wrongAnswerStreakRef.current,
+      preparedState: false,
+    });
+  }, [measuring, finalizeTask]);
+
+  const submitAnswerInput = useCallback(() => {
+    if (!measuring || !sessionRef.current?.activeMeasurement) return;
+    const s = sessionRef.current;
+    const tasks = getTasksForPhase(s);
+    const idx = s.currentTaskIndex ?? 0;
+    const task = tasks[idx];
+    if (!task || task.successType !== "answerInput") return;
+    const ok = answerMatchesAccepted(answerDraft, task.acceptedAnswers ?? []);
+    if (!ok) {
+      wrongAnswerStreakRef.current += 1;
+      setAnswerError("Atbilde nav pareiza. Mēģiniet vēlreiz vai izlaidiet uzdevumu.");
+      return;
+    }
+    const attemptsCount = wrongAnswerStreakRef.current + 1;
+    const prepared =
+      task.successType === "cartQuantity" ? task7PreparedRef.current : false;
+    finalizeTask({
+      completed: true,
+      skipped: false,
+      autoCompleted: true,
+      submittedAnswer: answerDraft.trim(),
+      attemptsCount,
+      preparedState: prepared,
+    });
+  }, [measuring, answerDraft, finalizeTask]);
+
+  const acknowledgeOutcome = useCallback(() => {
+    const s = sessionRef.current;
+    if (!s) return;
+    if (outcomeMeta.phase1End) {
+      commitSession({ ...s, testUi: "intro" });
+      setOutcomeMeta({});
+      navigate("/test/continue");
+      return;
+    }
+    if (outcomeMeta.sessionEnd) {
+      commitSession({ ...s, testUi: "intro" });
+      setOutcomeMeta({});
+      navigate("/test/complete");
+      return;
+    }
+    const tasks = getTasksForPhase(s);
+    const idx = s.currentTaskIndex ?? 0;
+    if (idx >= tasks.length - 1) return;
+    commitSession({
+      ...s,
+      currentTaskIndex: idx + 1,
+      testUi: "intro",
+      activeMeasurement: null,
+    });
+    setOutcomeMeta({});
+  }, [commitSession, navigate, outcomeMeta]);
+
+  useEffect(() => {
+    if (!outcomeOpen || !outcomeMeta?.sessionEnd) return undefined;
+    if (!isGoogleFormConfigured()) return undefined;
+    const t = window.setTimeout(() => {
+      acknowledgeOutcome();
+    }, 2000);
+    return () => window.clearTimeout(t);
+  }, [outcomeOpen, outcomeMeta?.sessionEnd, acknowledgeOutcome]);
+
+  const openInstructionPeek = useCallback(() => {
+    if (measuring) setInstructionPeekOpen(true);
+  }, [measuring]);
+
+  const closeInstructionPeek = useCallback(() => {
+    setInstructionPeekOpen(false);
+  }, []);
+
+  const elapsedSeconds = useCallback(() => {
+    const s = sessionRef.current;
+    const t = s?.activeMeasurement?.taskStartedAt;
+    if (!t) return 0;
+    return Math.floor((Date.now() - new Date(t).getTime()) / 1000);
+  }, []);
+
+  useEffect(() => {
+    if (!measuring || isCompletingTask || !session?.activeMeasurement) return undefined;
+    const s = sessionRef.current;
+    const tasks = getTasksForPhase(s);
+    const idx = s.currentTaskIndex ?? 0;
+    const task = tasks[idx];
+    if (!task || task.successType === "answerInput") return undefined;
+
+    const cartPageOpen = pathname.includes("/grozs");
+    const ok = evaluateAutoTaskSuccess({
+      task,
+      pathname,
+      hash,
+      lines,
+      cartPageOpen,
+    });
+    if (!ok) return undefined;
+
+    let cancelled = false;
+    const t = window.setTimeout(() => {
+      if (cancelled || finishingTaskRef.current) return;
+      const prepared =
+        task.successType === "cartQuantity" ? task7PreparedRef.current : false;
+      finalizeTask({
+        completed: true,
+        skipped: false,
+        autoCompleted: true,
+        submittedAnswer: "",
+        attemptsCount: 0,
+        preparedState: prepared,
+      });
+    }, 0);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(t);
+    };
+  }, [
+    measuring,
+    isCompletingTask,
+    session?.activeMeasurement,
+    session?.currentPhase,
+    session?.taskSetOrder,
+    pathname,
+    hash,
+    lines,
+    finalizeTask,
+  ]);
 
   const startNewSessionFromLanding = useCallback(
     (searchParams) => {
+      clearAllCartAndCheckoutStorage();
+      clearCart();
+      task7PreparedRef.current = false;
+      wrongAnswerStreakRef.current = 0;
       const testOrder = pickTestOrder(searchParams);
       const now = new Date().toISOString();
       const { phase1Variant, phase2Variant } = variantsFromOrder(testOrder);
+      const taskSetOrder = pickTaskSetOrder(searchParams);
       const next = {
         participantId: genParticipantId(),
         testOrder,
+        taskSetOrder,
         currentPhase: 1,
         currentVariant: phase1Variant,
         currentTaskIndex: 0,
@@ -391,6 +684,7 @@ export function TestSessionProvider({ children }) {
         sessionSummary: null,
         batchUploadFinishedAt: null,
         activeMeasurement: null,
+        testUi: "intro",
         sessionMeta: {
           userAgent: navigator.userAgent,
           viewportWidth: window.innerWidth,
@@ -401,9 +695,10 @@ export function TestSessionProvider({ children }) {
       setSession(next);
       setMeasuring(false);
       setClickCount(0);
+      setOutcomeMeta({});
       return { session: next, homePath: homePathForVariant(phase1Variant) };
     },
-    [],
+    [clearCart],
   );
 
   const applyPhaseTwoTransition = useCallback(() => {
@@ -411,6 +706,8 @@ export function TestSessionProvider({ children }) {
     if (!s) return { path: "/" };
     clearAllCartAndCheckoutStorage();
     clearCart();
+    task7PreparedRef.current = false;
+    wrongAnswerStreakRef.current = 0;
     const now = new Date().toISOString();
     const next = {
       ...s,
@@ -419,6 +716,7 @@ export function TestSessionProvider({ children }) {
       currentTaskIndex: 0,
       phase2StartedAt: now,
       activeMeasurement: null,
+      testUi: "intro",
     };
     commitSession(next);
     setMeasuring(false);
@@ -463,7 +761,15 @@ export function TestSessionProvider({ children }) {
       measuring,
       clickCount,
       isCompletingTask,
-      showPanel,
+      showPanel: showChrome,
+      showChrome,
+      introOpen,
+      outcomeOpen,
+      outcomeMeta,
+      instructionPeekOpen,
+      answerDraft,
+      setAnswerDraft: setAnswerDraftAndClearError,
+      answerError,
       isTestResultsEndpointConfigured: isTestResultsEndpointConfigured(),
       isGoogleFormConfigured: isGoogleFormConfigured(),
       refreshFromStorage,
@@ -471,8 +777,12 @@ export function TestSessionProvider({ children }) {
       startNewSessionFromLanding,
       applyPhaseTwoTransition,
       beginCurrentTask,
-      completeCurrentTask,
+      acknowledgeOutcome,
       skipCurrentTask,
+      submitAnswerInput,
+      openInstructionPeek,
+      closeInstructionPeek,
+      elapsedSeconds,
       buildGoogleFormUrl,
       downloadExports,
       downloadExportJson,
@@ -483,25 +793,36 @@ export function TestSessionProvider({ children }) {
       measuring,
       clickCount,
       isCompletingTask,
-      showPanel,
+      showChrome,
+      introOpen,
+      outcomeOpen,
+      outcomeMeta,
+      instructionPeekOpen,
+      answerDraft,
+      answerError,
       refreshFromStorage,
       resetEntireTest,
       startNewSessionFromLanding,
       applyPhaseTwoTransition,
       beginCurrentTask,
-      completeCurrentTask,
+      acknowledgeOutcome,
       skipCurrentTask,
+      submitAnswerInput,
+      openInstructionPeek,
+      closeInstructionPeek,
+      elapsedSeconds,
       buildGoogleFormUrl,
       downloadExports,
       downloadExportJson,
       downloadExportCsv,
+      setAnswerDraftAndClearError,
     ],
   );
 
   return (
     <TestSessionContext.Provider value={value}>
       {children}
-      {showPanel ? <UsabilityTestPanel /> : null}
+      {showChrome ? <UsabilityTestChrome /> : null}
     </TestSessionContext.Provider>
   );
 }
