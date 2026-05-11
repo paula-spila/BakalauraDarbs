@@ -111,29 +111,29 @@ export function UsabilityTestChrome() {
 
   const outcomeCopy = outcomeMeta?.sessionEnd
     ? {
-        title: "Tests pabeigts",
-        body: isGoogleFormConfigured
-          ? "Paldies! Praktiskā testa daļa ir noslēgta. Pēc īsa brīža jūs tiksiet novirzīts uz Google Forms anketu (varat arī nospiest pogu zemāk)."
-          : "Paldies! Praktiskā testa daļa ir noslēgta. Turpiniet ar rezultātu lapu un anketu.",
-        primary: isGoogleFormConfigured ? "Turpināt uz anketu" : "Atvērt rezultātu lapu",
-      }
+      title: "Tests pabeigts",
+      body: isGoogleFormConfigured
+        ? "Paldies! Praktiskā testa daļa ir noslēgta. Pēc īsa brīža jūs tiksiet novirzīts uz Google Forms anketu (varat arī nospiest pogu zemāk)."
+        : "Paldies! Praktiskā testa daļa ir noslēgta. Turpiniet ar rezultātu lapu un anketu.",
+      primary: isGoogleFormConfigured ? "Turpināt uz anketu" : "Atvērt rezultātu lapu",
+    }
     : outcomeMeta?.phase1End
       ? {
-          title: "Pirmā daļa pabeigta",
-          body: "Tagad turpināsies testa otrā daļa.",
-          primary: "Turpināt",
-        }
+        title: "Pirmā daļa pabeigta",
+        body: "Tagad turpināsies testa otrā daļa.",
+        primary: "Turpināt",
+      }
       : outcomeMeta?.skipped
         ? {
-            title: "Uzdevums izlaists",
-            body: "Uzdevums ir atzīmēts kā izlaists.",
-            primary: "Sākt nākamo uzdevumu",
-          }
+          title: "Uzdevums izlaists",
+          body: "Uzdevums ir atzīmēts kā izlaists.",
+          primary: "Sākt nākamo uzdevumu",
+        }
         : {
-            title: "Uzdevums izpildīts",
-            body: "Uzdevums ir veiksmīgi pabeigts.",
-            primary: "Sākt nākamo uzdevumu",
-          };
+          title: "Uzdevums izpildīts",
+          body: "Uzdevums ir veiksmīgi pabeigts.",
+          primary: "Sākt nākamo uzdevumu",
+        };
 
   return (
     <>
@@ -146,7 +146,7 @@ export function UsabilityTestChrome() {
           data-usability-chrome="true"
         >
           <div className="usability-modal usability-modal--intro">
-            <p className="usability-modal__eyebrow">Lietojamības tests</p>
+            <p className="usability-modal__eyebrow">Lietojamības efektivitātes tests</p>
             <p className="usability-modal__participant">
               Dalībnieka ID: {session.participantId}
             </p>

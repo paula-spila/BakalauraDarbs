@@ -1,5 +1,4 @@
-# E-veikala prototips (lietojamības tests)
-
+# E-veikala prototips (lietojamības efektivitātes tests)
 React lietotne ar Vite: fiktīva veikala saskarne, vienkāršā un piesātinātā UI variants un lietojamības testa plūsma (`/test`).
 
 ## Lokāli

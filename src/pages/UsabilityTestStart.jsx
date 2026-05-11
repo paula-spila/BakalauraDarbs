@@ -58,7 +58,7 @@ export function UsabilityTestStart() {
   return (
     <div className="usability-legal-page usability-test-start">
       <div className="usability-legal-page__inner usability-test-start__inner">
-        <h1 className="usability-test-start__h1">Lietojamības tests</h1>
+        <h1 className="usability-test-start__h1">Lietojamības efektivitātes tests</h1>
 
         {activeIncomplete ? (
           <div className="usability-callout usability-callout--info usability-test-start__resume">
