@@ -126,6 +126,9 @@ export function UsabilityTestStart() {
 
           <ul className="usability-test-start__list">
             <li>
+              <strong>Lūgums testu veikt datorā priekš vislabājakiem rezultātiem</strong>
+            </li>
+            <li>
               <strong>Maksājumi netiek veikti.</strong> Visi pasūtījumi un maksājumi šajā vietnē ir
               simulācija.
             </li>
