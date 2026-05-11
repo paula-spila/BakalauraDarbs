@@ -2,6 +2,7 @@ import { useEffect, useState, useMemo } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { categoryLabel, getProductById, PRODUCTS } from "../data/products.js";
 import { formatEur } from "../lib/formatEur.js";
+import { publicUrl } from "../lib/publicUrl.js";
 import { useCart } from "../context/CartContext.jsx";
 import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
 import { RichProductDetail } from "../variants/rich/RichProductDetail.jsx";
@@ -105,7 +106,7 @@ export function Product() {
           {showPhoto ? (
             <img
               className="detail__img"
-              src={product.image}
+              src={publicUrl(product.image)}
               alt={product.name}
               loading="eager"
               decoding="async"

@@ -10,8 +10,7 @@ export const HOME_CATEGORY_BLURB = {
 export const HOME_HERO = {
   kicker: "Ikdienas un mājas preces",
   title: "Viegla iepirkšanās - skaidra izvēle, draudzīgas cenas",
-  lead:
-    "Izvēlieties piederumus mājai, kurus patiešām lietosiet: virtuve, vannas istaba, uzglabāšana un pāris labu lietu ikdienai.",
+  lead: "Izvēlieties piederumus mājai, kurus patiešām lietosiet: virtuve, vannas istaba, uzglabāšana un pāris labu lietu ikdienai.",
 };
 
 export const HOME_TRUST_POINTS = [

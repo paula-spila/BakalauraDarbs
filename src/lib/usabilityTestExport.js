@@ -38,13 +38,14 @@ const CSV_COLUMNS = [
 ];
 
 function csvEscape(value) {
-  const s =
-    value === null || value === undefined
-      ? ""
-      : typeof value === "string"
-        ? value
-        : String(value);
+  const s = value === null || value === undefined
+    ? ""
+    : typeof value === "string"
+      ? value
+      : String(value);
+
   if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+
   return s;
 }
 
@@ -58,10 +59,12 @@ function rowFromTask(t) {
 function buildTasksCsv(session) {
   const rows = [CSV_COLUMNS.join(",")];
   const runs = Array.isArray(session?.taskRuns) ? session.taskRuns : [];
+
   for (const t of runs) {
     if (t._attemptsOnly) continue;
     rows.push(rowFromTask(t).join(","));
   }
+
   return rows.join("\r\n");
 }
 
@@ -85,14 +88,18 @@ function triggerDownload(filename, content, mime) {
 export function downloadSessionJsonOnly() {
   try {
     const raw = localStorage.getItem(USABILITY_SESSION_STORAGE_KEY);
+
     if (!raw) return false;
+
     const session = JSON.parse(raw);
     const pid = session?.participantId ?? "session";
+
     triggerDownload(
       `usability-test-${pid}.json`,
       buildSessionJsonBlob(session),
       "application/json;charset=utf-8",
     );
+
     return true;
   } catch {
     return false;
@@ -102,14 +109,18 @@ export function downloadSessionJsonOnly() {
 export function downloadSessionCsvOnly() {
   try {
     const raw = localStorage.getItem(USABILITY_SESSION_STORAGE_KEY);
+
     if (!raw) return false;
+
     const session = JSON.parse(raw);
     const pid = session?.participantId ?? "session";
+
     triggerDownload(
       `usability-test-${pid}.csv`,
       buildTasksCsv(session),
       "text/csv;charset=utf-8",
     );
+
     return true;
   } catch {
     return false;

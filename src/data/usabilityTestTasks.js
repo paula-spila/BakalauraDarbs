@@ -3,6 +3,7 @@ import { cheapestPriceInCategory } from "../lib/usabilityTaskSuccess.js";
 /** @param {number} price */
 export function buildPriceAcceptedList(price) {
   if (price == null || !Number.isFinite(Number(price))) return [];
+
   const n = Number(price);
   const sDot = n.toFixed(2);
   const sComma = sDot.replace(".", ",");
@@ -11,6 +12,7 @@ export function buildPriceAcceptedList(price) {
   const hasFrac = fracNum !== 0;
   const shortDot = hasFrac ? `${intPart}.${String(fracNum).padStart(2, "0")}` : intPart;
   const shortComma = hasFrac ? `${intPart},${String(fracNum).padStart(2, "0")}` : intPart;
+
   return Array.from(
     new Set([
       intPart,
@@ -38,7 +40,9 @@ const cheapestVirtuve = cheapestPriceInCategory(VIRTUVE_CAT);
 export function getTaskSetNumberForPhase(session, phase) {
   const p = phase ?? session?.currentPhase ?? 1;
   const order = session?.taskSetOrder === "21" ? "21" : "12";
+
   if (p === 1) return order === "12" ? 1 : 2;
+
   return order === "12" ? 2 : 1;
 }
 

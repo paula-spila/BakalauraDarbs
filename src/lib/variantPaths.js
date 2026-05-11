@@ -5,10 +5,7 @@ export function pathsForVariantToggle(pathname, search = "") {
   let pathB;
 
   if (isRich) {
-    const rest =
-      pathname === "/rich" || pathname === "/rich/"
-        ? "/"
-        : pathname.slice("/rich".length) || "/";
+    const rest = pathname === "/rich" || pathname === "/rich/" ? "/" : pathname.slice("/rich".length) || "/";
     pathA = rest + search;
     pathB = pathname + search;
   } else {

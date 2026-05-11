@@ -1,5 +1,6 @@
 export function formatEur(amount) {
   if (typeof amount !== "number" || Number.isNaN(amount)) return "";
+
   return new Intl.NumberFormat("lv-LV", {
     style: "currency",
     currency: "EUR",

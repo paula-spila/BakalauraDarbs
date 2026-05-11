@@ -41,9 +41,11 @@ function CornerVariantToggleHost() {
   const { session } = useTestSession();
   const onTestRoute = pathname.startsWith("/test");
   const activeIncompleteSession = Boolean(session && !session.sessionCompletedAt);
+
   if (onTestRoute || activeIncompleteSession) {
     return null;
   }
+
   return (
     <div className="variant-ab-host">
       <VariantSegmentToggle placement="corner" />
@@ -59,12 +61,8 @@ export default function App() {
         <Route path="/test" element={<UsabilityTestStart />} />
         <Route path="/test/continue" element={<UsabilityTestPhaseBridge />} />
         <Route path="/test/complete" element={<UsabilityTestComplete />} />
-        <Route path="/rich/*" element={<RichLayout />}>
-          {storeRouteList()}
-        </Route>
-        <Route path="/" element={<Layout />}>
-          {storeRouteList()}
-        </Route>
+        <Route path="/rich/*" element={<RichLayout />}>{storeRouteList()}</Route>
+        <Route path="/" element={<Layout />}>{storeRouteList()}</Route>
       </Routes>
     </>
   );

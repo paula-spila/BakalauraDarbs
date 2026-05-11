@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatEur } from "../lib/formatEur.js";
+import { publicUrl } from "../lib/publicUrl.js";
 import { usePrefixedTo, useVariant } from "../context/VariantContext.jsx";
 import { StarRow } from "./StarRow.jsx";
 
@@ -43,7 +44,7 @@ export function ProductCard({ product }) {
           {showPhoto ? (
             <img
               className="product-card__img"
-              src={product.image}
+              src={publicUrl(product.image)}
               alt=""
               loading="lazy"
               decoding="async"

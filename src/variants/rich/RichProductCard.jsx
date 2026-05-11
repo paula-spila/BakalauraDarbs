@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { formatEur } from "../../lib/formatEur.js";
+import { publicUrl } from "../../lib/publicUrl.js";
 import { useCart } from "../../context/CartContext.jsx";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
 import { StarRow } from "../../components/StarRow.jsx";
@@ -55,7 +56,7 @@ export function RichProductCard({ product, compact = false, shelf = false }) {
             <Link to={detail} className="rich-pcard-shelf__imglink">
               {showPhoto ? (
                 <img
-                  src={product.image}
+                  src={publicUrl(product.image)}
                   alt=""
                   loading="lazy"
                   decoding="async"
@@ -127,7 +128,7 @@ export function RichProductCard({ product, compact = false, shelf = false }) {
           <Link to={detail} className="rich-pcard__imglink">
             {showPhoto ? (
               <img
-                src={product.image}
+                src={publicUrl(product.image)}
                 alt=""
                 loading="lazy"
                 decoding="async"

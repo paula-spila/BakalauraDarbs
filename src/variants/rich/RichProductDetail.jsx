@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { categoryLabel, PRODUCTS } from "../../data/products.js";
 import { formatEur } from "../../lib/formatEur.js";
+import { publicUrl } from "../../lib/publicUrl.js";
 import { useCart } from "../../context/CartContext.jsx";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
 import { StarRow } from "../../components/StarRow.jsx";
@@ -57,7 +58,7 @@ export function RichProductDetail({
           <div className="rich-pdp__mainshot">
             {showPhoto ? (
               <img
-                src={product.image}
+                src={publicUrl(product.image)}
                 alt={product.name}
                 loading="eager"
                 decoding="async"
@@ -78,7 +79,7 @@ export function RichProductDetail({
                 tabIndex={-1}
               >
                 {showPhoto && !imgFailed ? (
-                  <img src={product.image} alt="" />
+                  <img src={publicUrl(product.image)} alt="" />
                 ) : (
                   <span>{initial}</span>
                 )}
@@ -248,7 +249,7 @@ export function RichProductDetail({
                   <span className="rich-pdp__bundle-thumb">
                     {showBundlePhoto ? (
                       <img
-                        src={p.image}
+                        src={publicUrl(p.image)}
                         alt=""
                         loading="lazy"
                         decoding="async"
