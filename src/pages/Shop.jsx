@@ -51,6 +51,10 @@ export function Shop() {
     setCategoryId(validCategoryId(kParam));
   }, [kParam]);
 
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("viens-shop-sort", { detail: sortKey }));
+  }, [sortKey]);
+
   const qNorm = useMemo(() => normalizeQ(qParam), [qParam]);
 
   const filtered = useMemo(() => {
@@ -84,7 +88,10 @@ export function Shop() {
     const arr = [...filtered];
     if (sortKey === "price-asc") arr.sort((a, b) => a.price - b.price);
     else if (sortKey === "price-desc") arr.sort((a, b) => b.price - a.price);
-    else if (sortKey === "name") arr.sort((a, b) => a.name.localeCompare(b.name, "lv"));
+    else if (sortKey === "name-asc")
+      arr.sort((a, b) => a.name.localeCompare(b.name, "lv"));
+    else if (sortKey === "name-desc")
+      arr.sort((a, b) => b.name.localeCompare(a.name, "lv"));
     else arr.sort((a, b) => a.id - b.id);
     return arr;
   }, [filtered, sortKey]);
@@ -138,7 +145,8 @@ export function Shop() {
             <option value="default">Ieteiktā secība</option>
             <option value="price-asc">Cena: no zemākās</option>
             <option value="price-desc">Cena: no augstākās</option>
-            <option value="name">Nosaukums (A–Ž)</option>
+            <option value="name-asc">Nosaukums (A–Z)</option>
+            <option value="name-desc">Nosaukums (Z–A)</option>
           </select>
         </div>
       </div>
@@ -257,7 +265,7 @@ export function Shop() {
                 checked={deliveryFilter === "fast"}
                 onChange={() => setDeliveryFilter("fast")}
               />
-              <span>Ātri (2–3 darba dienas)</span>
+              <span>Ātri (2-3 darba dienas)</span>
             </label>
             <label className="rich-filter-row">
               <input
@@ -266,7 +274,7 @@ export function Shop() {
                 checked={deliveryFilter === "slow"}
                 onChange={() => setDeliveryFilter("slow")}
               />
-              <span>Garāks (5–7 darba dienas)</span>
+              <span>Garāks (5-7 darba dienas)</span>
             </label>
           </fieldset>
         </div>
@@ -299,7 +307,8 @@ export function Shop() {
               <option value="default">Ieteiktā secība</option>
               <option value="price-asc">Cena: no zemākās</option>
               <option value="price-desc">Cena: no augstākās</option>
-              <option value="name">Nosaukums (A–Ž)</option>
+              <option value="name-asc">Nosaukums (A–Z)</option>
+              <option value="name-desc">Nosaukums (Z–A)</option>
             </select>
           </label>
         </div>
@@ -344,8 +353,8 @@ export function Shop() {
         <div className="rich-rail-card rich-rail-card--rail-quiet">
           <h2 className="rich-rail-card__title rich-rail-card__title--strong">Ātri fakti</h2>
           <p className="rich-rail-card__p">
-            Standarta piegāde: <strong>2–3 darba dienas</strong>. Dažām precēm{" "}
-            <strong>5–7 darba dienas</strong> — izmantojiet filtru kreisajā pusē.
+            Standarta piegāde: <strong>2-3 darba dienas</strong>. Dažām precēm{" "}
+            <strong>5–7 darba dienas</strong> - izmantojiet filtru kreisajā pusē.
           </p>
           <p className="rich-rail-card__p rich-rail-card__p--tight">
             Bezmaksas piegāde demonstrācijā no <strong>35,00 €</strong>.

@@ -1,9 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
 import { PRODUCT_CATEGORIES } from "../../data/products.js";
 
-/**
- * Dense variant only: main navigation with hover / focus-within flyouts.
- */
 export function RichHeaderTieredNav({ to, navClass }) {
   return (
     <div className="rich-header__nav-block rich-header__nav-block--main-nav">

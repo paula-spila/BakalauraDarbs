@@ -80,6 +80,10 @@ export function Info() {
             <a href="mailto:info@vienskarisimajam.lv">info@vienskarisimajam.lv</a>
           </p>
           <p className="muted">Tālrunis (darba laikā): +371 2000 0000</p>
+          <p>
+            <Link to={to("/kontakti")}>Sazināties</Link>
+            <span className="muted"> — pilnā kontaktu lapa un ziņas forma.</span>
+          </p>
           <div className="rich-info-tile__meta">
             <p>
               <strong>Darba laiks:</strong> darba dienās 9:00–17:00 (demonstrācija).
@@ -169,6 +173,10 @@ export function Info() {
             <a href="mailto:info@vienskarisimajam.lv">info@vienskarisimajam.lv</a>
           </p>
           <p className="muted">Tālrunis (darba laikā): +371 2000 0000</p>
+          <p>
+            <Link to={to("/kontakti")}>Sazināties</Link>
+            <span className="muted"> - pilnā kontaktu lapa un ziņas forma.</span>
+          </p>
         </div>
       </section>
 

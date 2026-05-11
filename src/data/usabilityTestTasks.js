@@ -57,14 +57,6 @@ export function getTaskCount() {
 export const TASK_SET_1 = [
   {
     id: "s1-t1",
-    title: "Produkta lapa",
-    instruction:
-      "Atrodiet produktu “Uzglabāšanas kaste” un atveriet tās preces lapu.",
-    successType: "productPage",
-    targetProductId: 9,
-  },
-  {
-    id: "s1-t2",
     title: "Kategorijas produkts",
     instruction:
       "Atrodiet jebkuru produktu kategorijā “Virtuve un galds” un atveriet tā produkta lapu.",
@@ -73,24 +65,22 @@ export const TASK_SET_1 = [
     targetCategoryName: "Virtuve un galds",
   },
   {
-    id: "s1-t3",
-    title: "Lētākais produkts",
+    id: "s1-t2",
+    title: "Preču kārtošana",
     instruction:
-      "Atrodiet lētāko produktu kategorijā “Māja un uzglabāšana” un ievadiet tā cenu.",
-    successType: "answerInput",
-    targetCategoryName: "Māja un uzglabāšana",
-    acceptedAnswers: buildPriceAcceptedList(cheapestMaja ?? 0),
+      "Veikalā sakārtojiet preces alfabētiskā secībā no A līdz Z.",
+    successType: "sortApplied",
+    targetSort: "name-asc",
+  },
+  {
+    id: "s1-t3",
+    title: "Saziņas sadaļa",
+    instruction: "Atrodiet kontaktinformācijas sadaļu.",
+    successType: "infoSection",
+    targetSection: "kontakti",
   },
   {
     id: "s1-t4",
-    title: "Cena zem 10 EUR",
-    instruction:
-      "Atrodiet produktu, kura cena ir zem “10 EUR”, un atveriet tā produkta lapu.",
-    successType: "priceConditionProduct",
-    maxPrice: 10,
-  },
-  {
-    id: "s1-t5",
     title: "Materiāls",
     instruction:
       "Atveriet produkta “USB atmiņa 32 GB” detalizēto lapu un ievadiet, no kāda materiāla tā ir izgatavota.",
@@ -106,6 +96,13 @@ export const TASK_SET_1 = [
       "plastmasa",
       "plastic",
     ],
+  },
+  {
+    id: "s1-t5",
+    title: "Piegādes nosacījumi",
+    instruction: "Atrodiet bezmaksas piegādes slieksni un ievadiet summu.",
+    successType: "answerInput",
+    acceptedAnswers: buildPriceAcceptedList(35),
   },
   {
     id: "s1-t6",
@@ -126,17 +123,27 @@ export const TASK_SET_1 = [
   },
   {
     id: "s1-t8",
-    title: "Piegādes nosacījumi",
-    instruction: "Atrodiet bezmaksas piegādes slieksni un ievadiet summu.",
+    title: "Kontaktadrese",
+    instruction:
+      "Atrodiet kontaktu / saziņas sadaļā norādīto ielu un mājas numuru un ievadiet to.",
     successType: "answerInput",
-    acceptedAnswers: buildPriceAcceptedList(35),
+    targetSection: "kontakti",
+    acceptedAnswers: [
+      "brīvības iela 123",
+      "brivibas iela 123",
+      "brīvības 123",
+      "brīvība 123",
+      "brivibas 123",
+    ],
   },
   {
     id: "s1-t9",
-    title: "Kontaktinformācija",
-    instruction: "Atrodiet kontaktinformācijas sadaļu.",
-    successType: "infoSection",
-    targetSection: "kontakti",
+    title: "Lētākais produkts",
+    instruction:
+      "Atrodiet lētāko produktu kategorijā “Māja un uzglabāšana” un ievadiet tā cenu.",
+    successType: "answerInput",
+    targetCategoryName: "Māja un uzglabāšana",
+    acceptedAnswers: buildPriceAcceptedList(cheapestMaja ?? 0),
   },
   {
     id: "s1-t10",
@@ -158,14 +165,6 @@ export const TASK_SET_1 = [
 export const TASK_SET_2 = [
   {
     id: "s2-t1",
-    title: "Produkta lapa",
-    instruction:
-      "Atrodiet produktu “Keramikas bļoda” un atveriet tā produkta lapu.",
-    successType: "productPage",
-    targetProductId: 5,
-  },
-  {
-    id: "s2-t2",
     title: "Kategorijas produkts",
     instruction:
       "Atrodiet jebkuru produktu kategorijā “Kanceleja un somas” un atveriet tā produkta lapu.",
@@ -174,24 +173,22 @@ export const TASK_SET_2 = [
     targetCategoryName: "Kanceleja un somas",
   },
   {
-    id: "s2-t3",
-    title: "Lētākais produkts",
+    id: "s2-t2",
+    title: "Preču kārtošana",
     instruction:
-      "Atrodiet lētāko produktu kategorijā “Virtuve un galds” un ievadiet tā cenu.",
-    successType: "answerInput",
-    targetCategoryName: "Virtuve un galds",
-    acceptedAnswers: buildPriceAcceptedList(cheapestVirtuve ?? 0),
+      "Veikalā sakārtojiet preces alfabētiskā secībā no Z līdz A.",
+    successType: "sortApplied",
+    targetSort: "name-desc",
+  },
+  {
+    id: "s2-t3",
+    title: "BUJ",
+    instruction: "Atrodiet „BUJ“ sadaļu.",
+    successType: "infoSection",
+    targetSection: "buj",
   },
   {
     id: "s2-t4",
-    title: "Cena virs 20 EUR",
-    instruction:
-      "Atrodiet produktu, kura cena ir augstāka par “20 EUR”, un atveriet tā produkta lapu.",
-    successType: "priceConditionProduct",
-    minPrice: 20,
-  },
-  {
-    id: "s2-t5",
     title: "Materiāls",
     instruction:
       "Atveriet produkta “Marķieri” detalizēto lapu un ievadiet, no kāda materiāla tie ir izgatavoti.",
@@ -206,6 +203,13 @@ export const TASK_SET_2 = [
       "plastic",
       "ink",
     ],
+  },
+  {
+    id: "s2-t5",
+    title: "Piegādes nosacījumi",
+    instruction: "Atrodiet standarta piegādes maksu un ievadiet summu.",
+    successType: "answerInput",
+    acceptedAnswers: buildPriceAcceptedList(3.5),
   },
   {
     id: "s2-t6",
@@ -226,17 +230,28 @@ export const TASK_SET_2 = [
   },
   {
     id: "s2-t8",
-    title: "Piegādes nosacījumi",
-    instruction: "Atrodiet standarta piegādes maksu un ievadiet summu.",
+    title: "Kontaktadrese",
+    instruction:
+      "Atrodiet kontaktu / saziņas sadaļā norādīto pilsētu un pasta indeksu un ievadiet tos.",
     successType: "answerInput",
-    acceptedAnswers: buildPriceAcceptedList(3.5),
+    targetSection: "kontakti",
+    acceptedAnswers: [
+      "rīga lv-1010",
+      "riga lv-1010",
+      "rīga, lv-1010",
+      "riga, lv-1010",
+      "rīga lv1010",
+      "riga lv1010",
+    ],
   },
   {
     id: "s2-t9",
-    title: "BUJ",
-    instruction: "Atrodiet „BUJ“ sadaļu.",
-    successType: "infoSection",
-    targetSection: "buj",
+    title: "Lētākais produkts",
+    instruction:
+      "Atrodiet lētāko produktu kategorijā “Virtuve un galds” un ievadiet tā cenu.",
+    successType: "answerInput",
+    targetCategoryName: "Virtuve un galds",
+    acceptedAnswers: buildPriceAcceptedList(cheapestVirtuve ?? 0),
   },
   {
     id: "s2-t10",

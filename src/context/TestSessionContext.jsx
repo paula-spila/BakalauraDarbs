@@ -133,6 +133,7 @@ export function TestSessionProvider({ children }) {
   const [answerDraft, setAnswerDraft] = useState("");
   const [answerError, setAnswerError] = useState("");
   const [outcomeMeta, setOutcomeMeta] = useState(() => ({}));
+  const [shopSortEpoch, setShopSortEpoch] = useState(0);
 
   const sessionRef = useRef(session);
   const measureClicksRef = useRef(0);
@@ -153,6 +154,12 @@ export function TestSessionProvider({ children }) {
     );
     completedIdsRef.current = ids;
   }, [session?.taskRuns]);
+
+  useEffect(() => {
+    const bump = () => setShopSortEpoch((n) => n + 1);
+    window.addEventListener("viens-shop-sort", bump);
+    return () => window.removeEventListener("viens-shop-sort", bump);
+  }, []);
 
   const commitSession = useCallback((next) => {
     const m = migrateSessionShape(next);
@@ -201,32 +208,32 @@ export function TestSessionProvider({ children }) {
 
   const awaitingPhase2Bridge = Boolean(
     session &&
-      session.phase1CompletedAt &&
-      !session.phase2StartedAt &&
-      !session.sessionCompletedAt,
+    session.phase1CompletedAt &&
+    !session.phase2StartedAt &&
+    !session.sessionCompletedAt,
   );
 
   const outcomeNeedsAck = session?.testUi === "outcome";
 
   const showChrome = Boolean(
     session &&
-      (!session.sessionCompletedAt || outcomeNeedsAck) &&
-      (!awaitingPhase2Bridge || outcomeNeedsAck) &&
-      !isTestPath &&
-      (pathname === "/" ||
-        pathname.startsWith("/veikals") ||
-        pathname.startsWith("/produkts") ||
-        pathname.startsWith("/grozs") ||
-        pathname.startsWith("/noformesana") ||
-        pathname.startsWith("/informacija") ||
-        pathname.startsWith("/par-mums") ||
-        pathname.startsWith("/kontakti") ||
-        pathname.startsWith("/piegade") ||
-        pathname.startsWith("/iepirkties") ||
-        pathname.startsWith("/noteikumi") ||
-        pathname.startsWith("/privatums") ||
-        pathname === "/rich" ||
-        pathname.startsWith("/rich/")),
+    (!session.sessionCompletedAt || outcomeNeedsAck) &&
+    (!awaitingPhase2Bridge || outcomeNeedsAck) &&
+    !isTestPath &&
+    (pathname === "/" ||
+      pathname.startsWith("/veikals") ||
+      pathname.startsWith("/produkts") ||
+      pathname.startsWith("/grozs") ||
+      pathname.startsWith("/noformesana") ||
+      pathname.startsWith("/informacija") ||
+      pathname.startsWith("/par-mums") ||
+      pathname.startsWith("/kontakti") ||
+      pathname.startsWith("/piegade") ||
+      pathname.startsWith("/iepirkties") ||
+      pathname.startsWith("/noteikumi") ||
+      pathname.startsWith("/privatums") ||
+      pathname === "/rich" ||
+      pathname.startsWith("/rich/")),
   );
 
   const testUi = session?.testUi ?? "intro";
@@ -294,6 +301,12 @@ export function TestSessionProvider({ children }) {
     document.addEventListener("pointerdown", onPointerDown, true);
     return () => document.removeEventListener("pointerdown", onPointerDown, true);
   }, [measuring, session?.activeMeasurement, persist]);
+
+  useEffect(() => {
+    const bump = () => setShopSortEpoch((n) => n + 1);
+    window.addEventListener("viens-shop-sort", bump);
+    return () => window.removeEventListener("viens-shop-sort", bump);
+  }, []);
 
   useEffect(() => {
     const s = sessionRef.current;
@@ -375,6 +388,7 @@ export function TestSessionProvider({ children }) {
           targetProductId: task.targetProductId ?? "",
           targetCategoryName: task.targetCategoryName ?? "",
           targetSection: task.targetSection ?? "",
+          targetSort: task.targetSort ?? "",
           targetQuantity: task.targetQuantity ?? "",
           maxPrice: task.maxPrice ?? "",
           minPrice: task.minPrice ?? "",
@@ -536,6 +550,20 @@ export function TestSessionProvider({ children }) {
     const idx = s.currentTaskIndex ?? 0;
     const task = tasks[idx];
     if (!task || task.successType !== "answerInput") return;
+    if (task.targetSection) {
+      const onSection = evaluateAutoTaskSuccess({
+        task: { ...task, successType: "infoSection" },
+        pathname,
+        hash,
+        lines: [],
+      });
+      if (!onSection) {
+        setAnswerError(
+          "Vispirms atveriet kontaktu lapu ar adreses informāciju, tad iesniedziet atbildi.",
+        );
+        return;
+      }
+    }
     const ok = answerMatchesAccepted(answerDraft, task.acceptedAnswers ?? []);
     if (!ok) {
       wrongAnswerStreakRef.current += 1;
@@ -553,7 +581,7 @@ export function TestSessionProvider({ children }) {
       attemptsCount,
       preparedState: prepared,
     });
-  }, [measuring, answerDraft, finalizeTask]);
+  }, [measuring, answerDraft, finalizeTask, pathname, hash]);
 
   const acknowledgeOutcome = useCallback(() => {
     const s = sessionRef.current;
@@ -614,13 +642,11 @@ export function TestSessionProvider({ children }) {
     const task = tasks[idx];
     if (!task || task.successType === "answerInput") return undefined;
 
-    const cartPageOpen = pathname.includes("/grozs");
     const ok = evaluateAutoTaskSuccess({
       task,
       pathname,
       hash,
       lines,
-      cartPageOpen,
     });
     if (!ok) return undefined;
 
@@ -652,6 +678,7 @@ export function TestSessionProvider({ children }) {
     hash,
     lines,
     finalizeTask,
+    shopSortEpoch,
   ]);
 
   const startNewSessionFromLanding = useCallback(

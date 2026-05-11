@@ -155,7 +155,7 @@ export function UsabilityTestComplete() {
           ) : null}
           {batchSheetStatus === "local_only" ? (
             <p className="muted">
-              Rezultātu serveris nav konfigurēts — dati nav nosūtīti uz attālinātu endpoint. Lejupielādējiet JSON/CSV zemāk.
+              Rezultātu serveris nav konfigurēts. Lejupielādējiet JSON/CSV zemāk.
             </p>
           ) : null}
           {batchSheetStatus === "failed" && isTestResultsEndpointConfigured ? (

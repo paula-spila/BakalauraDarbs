@@ -166,7 +166,7 @@ export function UsabilityTestStart() {
           </button>
         </div>
 
-        <p className="muted usability-hint usability-test-start__debug">
+        {/* <p className="muted usability-hint usability-test-start__debug">
           Debug:{" "}
           <Link to="/test?reset=true&order=AB&taskSetOrder=12">AB+12</Link>
           {" · "}
@@ -177,7 +177,7 @@ export function UsabilityTestStart() {
           <Link to="/test?reset=true&order=BA&taskSetOrder=21">BA+21</Link>
           {" · "}
           <Link to="/test?reset=true">Notīrīt sesiju</Link>
-        </p>
+        </p> */}
       </div>
     </div>
   );

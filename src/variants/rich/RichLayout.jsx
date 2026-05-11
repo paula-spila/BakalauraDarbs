@@ -154,7 +154,7 @@ export function RichLayout() {
             <span className="top-bar__sep" aria-hidden="true">
               ·
             </span>
-            <span>2–3 darba dienas</span>
+            <span>2-3 darba dienas</span>
           </div>
         </div>
 
@@ -174,7 +174,7 @@ export function RichLayout() {
                     <span className="site-logo__mark" aria-hidden="true" />
                     <span className="site-logo__text-stack">
                       <span className="site-logo__line">Vienkārši mājām</span>
-                      <span className="site-logo__sub">Mājas preču supercentrs</span>
+                      <span className="site-logo__sub">Mājas preces</span>
                     </span>
                   </NavLink>
                 </div>
@@ -262,7 +262,7 @@ export function RichLayout() {
                   ✓
                 </span>
                 <span>
-                  <strong>Simulēta</strong> apmaksa — droša demonstrācija pārlūkā.
+                  <strong>Simulēta</strong> apmaksa - droša demonstrācija pārlūkā.
                 </span>
               </div>
               <div className="rich-site-footer__trust-item">
@@ -285,8 +285,7 @@ export function RichLayout() {
 
             <p className="rich-site-footer__tagline">
               <strong>Supercentra pieredze (B variants):</strong> blīvs katalogs, sānjoslas,
-              akciju joslas un ātrās saites — paredzēts salīdzinājumam ar{" "}
-              <strong>minimālo A variantu</strong> tajā pašā saturā.
+              akciju joslas un ātrās saites.
             </p>
 
             <div className="rich-site-footer__cols">
@@ -339,7 +338,7 @@ export function RichLayout() {
                 </p>
                 <p>
                   <a href="tel:+37120000000">+371 2000 0000</a>
-                  <span className="muted"> · darba dienās 9:00–17:00</span>
+                  <span className="muted"> · darba dienās 9:00-17:00</span>
                 </p>
               </div>
               <div className="rich-site-footer__col">
@@ -359,9 +358,8 @@ export function RichLayout() {
             </div>
           </div>
           <p className="site-footer__bottom">
-            © {new Date().getFullYear()} Vienkārši mājām — ikdienas un mājas preces.{" "}
+            © {new Date().getFullYear()} Vienkārši mājām - ikdienas un mājas preces.{" "}
             Mācību / demonstrācijas projekts. Cenas eiro (€), PVN ieskaitot.{" "}
-            <strong>Variants B (ne minimālais).</strong>
           </p>
         </footer>
         <RichHelpChat />

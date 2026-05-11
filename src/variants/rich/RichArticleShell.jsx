@@ -27,9 +27,6 @@ function RichDefaultAside() {
   );
 }
 
-/**
- * Dense variant only: breadcrumb + two-column shell for static / prose pages.
- */
 export function RichArticleShell({ currentLabel, aside, children }) {
   const to = usePrefixedTo();
   return (

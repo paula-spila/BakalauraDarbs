@@ -17,6 +17,7 @@ export function normalizeAnswer(value) {
  * @param {string} s
  */
 function normalizePriceToken(s) {
+  if (/[a-z]/.test(s)) return s;
   const m = s.match(/(\d+)(?:[.,](\d+))?/);
   if (!m) return s;
   const int = m[1].replace(/^0+(?=\d)/, "") || "0";

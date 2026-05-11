@@ -71,6 +71,7 @@ export function buildTaskApiPayload(row) {
     targetProductId: row.targetProductId ?? "",
     targetCategoryName: row.targetCategoryName ?? "",
     targetSection: row.targetSection ?? "",
+    targetSort: row.targetSort ?? "",
     targetQuantity: row.targetQuantity ?? "",
     maxPrice: row.maxPrice ?? "",
     minPrice: row.minPrice ?? "",

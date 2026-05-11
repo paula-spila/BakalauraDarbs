@@ -15,6 +15,7 @@ const CSV_COLUMNS = [
   "targetProductId",
   "targetCategoryName",
   "targetSection",
+  "targetSort",
   "targetQuantity",
   "maxPrice",
   "minPrice",

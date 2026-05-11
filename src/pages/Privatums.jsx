@@ -23,7 +23,7 @@ export function Privatums() {
         <h2 className="section-title">Formas</h2>
         <p>
           Noformēšanas un kontaktu formas vērtības šis demonstrācijas projekts
-          neapstrādā ārējā serverī — iesniegšana beidzas ar statisku apstiprinājuma
+          neapstrādā ārējā serverī - iesniegšana beidzas ar statisku apstiprinājuma
           ekrānu. Neievadiet jutīgus datus, ja izmantojat koplietotu datoru.
         </p>
         <h2 className="section-title">Sīkdatnes</h2>

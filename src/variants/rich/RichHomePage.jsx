@@ -8,7 +8,6 @@ import {
   HOME_TRUST_POINTS,
 } from "../../data/homePageShared.js";
 
-/** Papildu ID tikai B sākumlapai — 8 ieteiktās kartītes (2 pilnas rindas), nemainot A variantu. */
 const RICH_HOME_EXTRA_FEATURED_IDS = [5, 11, 1, 3, 4];
 import { RichProductCard } from "./RichProductCard.jsx";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
@@ -73,10 +72,6 @@ const VALUE_META = [
   },
 ];
 
-/**
- * Dense (/rich) home — same sections and catalogue highlights as the minimal home,
- * with richer layout, colour, cards, and decorative chrome only under `.variant-rich`.
- */
 export function RichHomePage() {
   const to = usePrefixedTo();
   const featuredIds = [

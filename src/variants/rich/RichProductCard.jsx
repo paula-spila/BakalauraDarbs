@@ -5,14 +5,12 @@ import { useCart } from "../../context/CartContext.jsx";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
 import { StarRow } from "../../components/StarRow.jsx";
 
-/** Decorative “was” price — thesis demo only; maksas cena is always `product.price`. */
 function decorativeOldPrice(price, id) {
   if (id % 5 !== 0) return null;
   const old = Math.round(Number(price) * 1.14 * 100) / 100;
   return old > price ? old : null;
 }
 
-/** `shelf` — dense veikals: horizontāla kataloga rinda (≠ minimālā kartīšu režģis). */
 export function RichProductCard({ product, compact = false, shelf = false }) {
   const to = usePrefixedTo();
   const { addToCart } = useCart();

@@ -70,12 +70,12 @@ export function Layout() {
           <NavLink to={to("/veikals")}>Veikals</NavLink>
           <NavLink to={to("/piegade")}>Piegāde</NavLink>
           <NavLink to={to("/informacija")}>BUJ</NavLink>
-          <NavLink to={to("/kontakti")}>Kontakti</NavLink>
+          <NavLink to={to("/kontakti")}>Sazināties</NavLink>
           <NavLink to={to("/par-mums")}>Par mums</NavLink>
           <NavLink to={to("/noteikumi")}>Noteikumi</NavLink>
         </nav>
         <p className="site-footer__bottom">
-          © {new Date().getFullYear()} Vienkārši mājām. Variants A (minimālais).
+          © {new Date().getFullYear()} Vienkārši mājām. Variants A.
         </p>
       </footer>
     </div>

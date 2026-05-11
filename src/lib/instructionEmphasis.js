@@ -1,6 +1,4 @@
 /**
- * Sadala instrukciju fragmentos: parasts teksts un teksts starp tipogrāfiskajām pēdiņām “…”
- * (U+201C / U+201D), ko UI rāda treknrakstā (piem., produkta nosaukumi).
  * @param {string} instruction
  * @returns {{ type: "text" | "em", value: string }[]}
  */

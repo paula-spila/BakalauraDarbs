@@ -27,6 +27,15 @@ function lineForProduct(lines, productId) {
   return (lines ?? []).find((l) => Number(l.productId) === id) ?? null;
 }
 
+function readShopSortSelectValue() {
+  if (typeof document === "undefined") return "";
+  const min = document.getElementById("shop-sort-min-select");
+  if (min && "value" in min) return String(min.value ?? "").trim();
+  const rich = document.querySelector(".rich-shop-sort select");
+  if (rich && "value" in rich) return String(rich.value ?? "").trim();
+  return "";
+}
+
 function readCheckoutDom() {
   const pick = (...ids) => {
     for (const id of ids) {
@@ -195,7 +204,6 @@ export function evaluateAutoTaskSuccess(args) {
     pathname,
     hash,
     lines,
-    cartPageOpen,
   } = args;
   if (!task?.successType) return false;
   const st = task.successType;
@@ -227,12 +235,19 @@ export function evaluateAutoTaskSuccess(args) {
     return product.price < max;
   }
 
+  if (st === "sortApplied") {
+    const path = pathname.toLowerCase();
+    if (!path.includes("/veikals")) return false;
+    const want = String(task.targetSort ?? "").trim();
+    if (!want) return false;
+    return readShopSortSelectValue() === want;
+  }
+
   if (st === "answerInput") {
     return false;
   }
 
   if (st === "cartContainsAndOpened") {
-    if (!cartPageOpen) return false;
     const line = lineForProduct(lines, task.targetProductId);
     const minQ = Number(task.minQuantity ?? 1);
     if (!line) return false;

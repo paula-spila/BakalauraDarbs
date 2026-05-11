@@ -2,9 +2,6 @@ import { useEffect, useId, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePrefixedTo } from "../../context/VariantContext.jsx";
 
-/**
- * Demonstrācijas “tērzēšanas” logrīks — tikai B variants, bez īstas saziņas.
- */
 export function RichHelpChat() {
   const to = usePrefixedTo();
   const [open, setOpen] = useState(false);
