@@ -234,9 +234,6 @@ export function UsabilityTestChrome() {
                     {task.checkoutTestData.street}, {task.checkoutTestData.city}, {task.checkoutTestData.postalCode}
                     {task.checkoutTestData.phone ? `, tālr. ${task.checkoutTestData.phone}` : ""}.
                   </p>
-                  <p className="usability-bottom-bar__testdata-hint muted">
-                    Pilns saraksts modālī — poga „Parādīt uzdevumu un testa datus” (laiks turpinās skaitīties).
-                  </p>
                 </div>
               ) : null}
               {isAnswer ? (
